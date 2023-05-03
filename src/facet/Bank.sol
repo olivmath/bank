@@ -2,26 +2,24 @@
 pragma solidity ^0.8.18;
 
 import {Token} from "./Token.sol";
+import "../diamont/Diamond.Storage.Lib.sol";
 
 contract Bank {
+    using DiamondStorageLib for DiamondStorageLib.Storage;
     address public token;
 
-    struct Employee {
-        address employee;
-        uint256 budge;
-    }
-
-    address public controller;
-    mapping(address => Employee) public employees;
-    address[] public employeeList;
 
     constructor(address _token) {
-        controller = msg.sender;
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
+
+        ds.controller = msg.sender;
         token = _token;
     }
 
     modifier onlyController() {
-        require(msg.sender == controller, "NOT_AUTHORIZED");
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
+
+        require(msg.sender == ds.controller, "NOT_AUTHORIZED");
         _;
     }
 
@@ -31,9 +29,11 @@ contract Bank {
      * @param _budge budge amount for the employee
      */
     function createEmployee(address _employee, uint256 _budge) public onlyController {
-        require(employees[_employee].employee == address(0), "Employee already exists.");
-        employees[_employee] = Employee(_employee, _budge);
-        employeeList.push(_employee);
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
+
+        require(ds.employees[_employee].employee == address(0), "Employee already exists.");
+        ds.employees[_employee] = DiamondStorageLib.Employee(_employee, _budge);
+        ds.employeeList.push(_employee);
     }
 
     /**
@@ -42,8 +42,10 @@ contract Bank {
      * @param _budge new budge amount for the employee
      */
     function updateEmployee(address _employee, uint256 _budge) public onlyController {
-        require(employees[_employee].employee != address(0), "Employee does not exist.");
-        employees[_employee].budge = _budge;
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
+
+        require(ds.employees[_employee].employee != address(0), "Employee does not exist.");
+        ds.employees[_employee].budge = _budge;
     }
 
     /**
@@ -51,14 +53,16 @@ contract Bank {
      * @param _employee address of the employee to be deleted
      */
     function deleteEmployee(address _employee) public onlyController {
-        require(employees[_employee].employee != address(0), "Employee does not exist.");
-        delete employees[_employee];
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
+
+        require(ds.employees[_employee].employee != address(0), "Employee does not exist.");
+        delete ds.employees[_employee];
 
         // Remove employee from employeeList
-        for (uint256 i = 0; i < employeeList.length; i++) {
-            if (employeeList[i] == _employee) {
-                employeeList[i] = employeeList[employeeList.length - 1];
-                employeeList.pop();
+        for (uint256 i = 0; i < ds.employeeList.length; i++) {
+            if (ds.employeeList[i] == _employee) {
+                ds.employeeList[i] = ds.employeeList[ds.employeeList.length - 1];
+                ds.employeeList.pop();
                 break;
             }
         }
@@ -69,7 +73,9 @@ contract Bank {
      * @return array containing addresses of all employees
      */
     function getAllEmployees() public view returns (address[] memory) {
-        return employeeList;
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
+
+        return ds.employeeList;
     }
 
     /**
@@ -77,7 +83,9 @@ contract Bank {
      * @return address and budge of a employee
      */
     function getEmployee(address employee) public view returns (address, uint256) {
-        Employee memory emp = employees[employee];
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
+
+        DiamondStorageLib.Employee memory emp = ds.employees[employee];
         return (emp.employee, emp.budge);
     }
 }
