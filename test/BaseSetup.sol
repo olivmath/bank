@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {Bank} from "../src/Bank.sol";
-import {Token} from "../src/Token.sol";
+import {Bank} from "../src/facet/Bank.sol";
+import {Token} from "../src/facet/Token.sol";
 import {Test} from "forge-std/Test.sol";
 
 contract BaseSetup is Test {
@@ -28,7 +28,6 @@ contract BaseSetup is Test {
         vm.label(alice, "ALICE");
         vm.label(bob, "BOB");
 
-
         vm.prank(controller);
         token = new Token();
         vm.prank(controller);
@@ -41,7 +40,6 @@ contract BaseSetup is Test {
         nextUser = keccak256(abi.encodePacked(nextUser));
         return user;
     }
-
 
     ///
     function createUsers(uint256 userNum) private returns (address payable[] memory) {
