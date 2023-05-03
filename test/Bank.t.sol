@@ -7,6 +7,10 @@ import {Test} from "forge-std/Test.sol";
 import {BaseSetup} from "./BaseSetup.sol";
 
 contract BankTest is BaseSetup {
+    function setUp() public virtual override {
+        BaseSetup.setUp();
+    }
+
     function testCreateEmployee() public {
         vm.prank(controller);
         bank.createEmployee(bob, 5000);
@@ -61,7 +65,7 @@ contract BankTest is BaseSetup {
         bank.createEmployee(alice, 1000);
 
         // Attempt to create the same employee again
-        (bool success, ) = address(bank).call(abi.encodeWithSignature("createEmployee(address,uint256)", alice, 1000));
+        (bool success,) = address(bank).call(abi.encodeWithSignature("createEmployee(address,uint256)", alice, 1000));
         assertFalse(success, "Creating duplicate employee should fail.");
 
         // Verify that only one employee was created

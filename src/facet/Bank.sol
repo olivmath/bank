@@ -6,8 +6,8 @@ import "../diamont/Diamond.Storage.Lib.sol";
 
 contract Bank {
     using DiamondStorageLib for DiamondStorageLib.Storage;
-    address public token;
 
+    address public token;
 
     constructor(address _token) {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
