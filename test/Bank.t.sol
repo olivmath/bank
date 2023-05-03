@@ -34,9 +34,12 @@ contract BankTest is BaseSetup {
     function testDeleteEmployee() public {
         vm.startPrank(controller);
         bank.createEmployee(alice, 1000);
+        bank.createEmployee(bob, 2000);
         bank.deleteEmployee(alice);
         vm.stopPrank();
         (address employee,) = bank.getEmployee(alice);
+        address[] memory employees = bank.getAllEmployees();
+        assertEq(employees.length, 1, "Employee budge should be updated to 3000.");
         assertTrue(employee == address(0), "Employee should be deleted.");
     }
 
