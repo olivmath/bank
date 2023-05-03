@@ -3,7 +3,6 @@ pragma solidity ^0.8.18;
 
 import {Token} from "./Token.sol";
 
-
 contract Bank {
     address public token;
 
@@ -32,6 +31,7 @@ contract Bank {
      * @param _budge budge amount for the employee
      */
     function createEmployee(address _employee, uint256 _budge) public onlyController {
+        require(employees[_employee].employee == address(0), "Employee already exists.");
         employees[_employee] = Employee(_employee, _budge);
         employeeList.push(_employee);
     }
@@ -71,7 +71,6 @@ contract Bank {
     function getAllEmployees() public view returns (address[] memory) {
         return employeeList;
     }
-
 
     /**
      * @dev Get a employee
