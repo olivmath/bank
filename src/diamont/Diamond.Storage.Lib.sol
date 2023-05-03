@@ -13,7 +13,6 @@ library DiamondStorageLib {
         address controller;
         address[] employeeList;
         mapping(address => Employee) employees;
-        
         mapping(bytes4 => address) fnSelectorToFacet;
         mapping(address => bytes4[]) facetToFnSelector;
         uint256 fnSelectorLength;

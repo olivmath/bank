@@ -7,22 +7,12 @@ import "./interfaces/ILoupe.sol";
 contract DiamondLoupe is IDiamondLoupe {
     using DiamondStorageLib for DiamondStorageLib.Storage;
 
-    function facetAddress(bytes4 fnSelector)
-        external
-        view
-        override
-        returns (address facetAddress_)
-    {
+    function facetAddress(bytes4 fnSelector) external view override returns (address facetAddress_) {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
         facetAddress_ = ds.fnSelectorToFacet[fnSelector];
     }
 
-    function facetFunctionSelectors(address facet_)
-        external
-        view
-        override
-        returns (bytes4[] memory fnSelectors)
-    {
+    function facetFunctionSelectors(address facet_) external view override returns (bytes4[] memory fnSelectors) {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
         fnSelectors = new bytes4[](ds.fnSelectorLength);
         uint256 index = 0;
