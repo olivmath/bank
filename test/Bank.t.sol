@@ -8,13 +8,23 @@ import {BaseSetup} from "./BaseSetup.sol";
 
 contract BankTest is BaseSetup {
     function setUp() public virtual override {
+        // ----------------
+        // BANK CONTRACT
+        // ----------------
+        // 0x520a19c0  =>  createEmployee(address,uint256)
+        // 0x5e91d8ec  =>  updateEmployee(address,uint256)
+        // 0x6e7c4ab1  =>  deleteEmployee(address)
+        // 0xe3366fed  =>  getAllEmployees() -> address[] memory
+        // 0x32648e09  =>  getEmployee(address) -> (address, uint256)
+
         BaseSetup.setUp();
     }
 
     function testCreateEmployee() public {
         vm.prank(controller);
-        bank.createEmployee(bob, 5000);
-        (address employee, uint256 budge) = bank.getEmployee(bob);
+        address(diamond).call(abi.encodeWithSelector(0x520a19c0, bob, 5000));
+        (, bytes memory data) = address(diamond).call(abi.encodeWithSelector(0x32648e09, bob));
+        (address employee, uint256 budge) = abi.decode(data, (address, uint256));
 
         assertEq(employee, bob, "Employee address should be equal to bob's address.");
         assertEq(budge, 5000, "Employee budge should be 5000.");
@@ -22,54 +32,76 @@ contract BankTest is BaseSetup {
 
     function testUpdateEmployee() public {
         vm.startPrank(controller);
-        bank.createEmployee(alice, 2000);
-        bank.updateEmployee(alice, 3000);
+        address(diamond).call(abi.encodeWithSelector(0x520a19c0, alice, 2000));
+        address(diamond).call(abi.encodeWithSelector(0x5e91d8ec, alice, 3000));
         vm.stopPrank();
-        (, uint256 budge) = bank.getEmployee(alice);
+        (, bytes memory data) = address(diamond).call(abi.encodeWithSelector(0x32648e09, alice));
+        (, uint256 budge) = abi.decode(data, (address, uint256));
 
         assertEq(budge, 3000, "Employee budge should be updated to 3000.");
     }
 
     function testFailUpdateNonexistentEmployee() public {
         vm.prank(controller);
-        bank.updateEmployee(alice, 3000);
+        (bool success, bytes memory data) =
+            address(diamond).call(abi.encodeWithSelector(0x5e91d8ec, address(123), 3000));
+        if (!success) {
+            revert(abi.decode(data, (string)));
+        }
     }
 
     function testDeleteEmployee() public {
         vm.startPrank(controller);
-        bank.createEmployee(alice, 1000);
-        bank.createEmployee(bob, 2000);
-        bank.deleteEmployee(alice);
+        address(diamond).call(abi.encodeWithSelector(0x520a19c0, alice, 1000));
+        address(diamond).call(abi.encodeWithSelector(0x520a19c0, bob, 2000));
+        address(diamond).call(abi.encodeWithSelector(0x6e7c4ab1, alice));
         vm.stopPrank();
-        (address employee,) = bank.getEmployee(alice);
-        address[] memory employees = bank.getAllEmployees();
+
+        (, bytes memory data1) = address(diamond).call(abi.encodeWithSelector(0x32648e09, alice));
+        (address employee,) = abi.decode(data1, (address, uint256));
+
+        (, bytes memory data2) = address(diamond).call(abi.encodeWithSelector(0xe3366fed));
+        address[] memory employees = abi.decode(data2, (address[]));
+
         assertEq(employees.length, 1, "Employee budge should be updated to 3000.");
         assertTrue(employee == address(0), "Employee should be deleted.");
     }
 
     function testGetAllEmployees() public {
-        vm.prank(controller);
-        bank.createEmployee(alice, 1000);
-        vm.prank(controller);
-        bank.createEmployee(bob, 2000);
+        vm.startPrank(controller);
+        address(diamond).call(abi.encodeWithSelector(0x520a19c0, alice, 1000));
+        address(diamond).call(abi.encodeWithSelector(0x520a19c0, bob, 2000));
+        address(diamond).call(abi.encodeWithSelector(0x520a19c0, address(0x3333), 3000));
+        vm.stopPrank();
 
-        address[] memory employees = bank.getAllEmployees();
-        assertTrue(employees.length == 2, "There should be two employees.");
-        assertTrue(employees[0] == alice || employees[1] == alice, "Alice should be in the list of employees.");
-        assertTrue(employees[0] == bob || employees[1] == bob, "Bob should be in the list of employees.");
+        (, bytes memory data2) = address(diamond).call(abi.encodeWithSelector(0xe3366fed));
+        address[] memory employees = abi.decode(data2, (address[]));
+
+        assertTrue(employees.length == 3, "There should be 3 employees.");
+        assertTrue(
+            employees[0] == alice || employees[1] == alice || employees[2] == alice,
+            "Alice should be in the list of employees."
+        );
+        assertTrue(
+            employees[0] == alice || employees[1] == bob || employees[2] == bob,
+            "Bob should be in the list of employees."
+        );
+        assertTrue(
+            employees[0] == address(0x3333) || employees[1] == address(0x3333) || employees[2] == address(0x3333),
+            "0x3333 should be in the list of employees."
+        );
     }
 
     function testCreateDuplicateEmployee() public {
-        // Test creating a duplicate employee
         vm.prank(controller);
-        bank.createEmployee(alice, 1000);
+        address(diamond).call(abi.encodeWithSelector(0x520a19c0, alice, 1000));
 
-        // Attempt to create the same employee again
-        (bool success,) = address(bank).call(abi.encodeWithSignature("createEmployee(address,uint256)", alice, 1000));
+        vm.prank(controller);
+        (bool success,) = address(diamond).call(abi.encodeWithSelector(0x520a19c0, alice, 1000));
         assertFalse(success, "Creating duplicate employee should fail.");
 
-        // Verify that only one employee was created
-        address[] memory employees = bank.getAllEmployees();
+        (, bytes memory data2) = address(diamond).call(abi.encodeWithSelector(0xe3366fed));
+        address[] memory employees = abi.decode(data2, (address[]));
         assertTrue(employees.length == 1, "There should be only one employee.");
     }
 }

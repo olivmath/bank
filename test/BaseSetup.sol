@@ -39,16 +39,17 @@ contract BaseSetup is Test {
         // ----------------
         // DIAMOND CONTRACT
         // ----------------
+        vm.prank(controller);
         diamond = new Diamond();
 
         // ----------------
         // BANK CONTRACT
         // ----------------
-        // - createEmployee(address _employee, uint256 _budge) -> void
-        // - updateEmployee(address _employee, uint256 _budge) -> void
-        // - deleteEmployee(address _employee) -> void
-        // - getEmployee(address employee) -> (address, uint256)
-        // - getAllEmployees() -> address[] memory
+        // 0x520a19c0  =>  createEmployee(address,uint256)
+        // 0x5e91d8ec  =>  updateEmployee(address,uint256)
+        // 0x6e7c4ab1  =>  deleteEmployee(address)
+        // 0xe3366fed  =>  getAllEmployees() -> address[] memory
+        // 0x32648e09  =>  getEmployee(address) -> (address, uint256)
         bytes4[] memory selectors = new bytes4[](5);
         selectors[0] = Bank.createEmployee.selector;
         selectors[1] = Bank.updateEmployee.selector;
