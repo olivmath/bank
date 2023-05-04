@@ -10,9 +10,11 @@ library DiamondStorageLib {
     }
 
     struct Storage {
-        address controller;
-        address[] employeeList;
         mapping(address => Employee) employees;
+        address[] employeeList;
+        address controller;
+        address token;
+        //
         mapping(bytes4 => address) fnSelectorToFacet;
         mapping(address => bytes4[]) facetToFnSelector;
         uint256 fnSelectorLength;
@@ -24,5 +26,22 @@ library DiamondStorageLib {
         assembly {
             ds.slot := storagePosition
         }
+    }
+
+    function setController(address newController) internal {
+        Storage storage ds = getDiamondStorage();
+        ds.controller = newController;
+    }
+
+    function controller() internal view returns (address) {
+        return getDiamondStorage().controller;
+    }
+
+    function token() internal view returns (address) {
+        return getDiamondStorage().token;
+    }
+
+    function onlyController() internal view {
+        require(getDiamondStorage().controller == msg.sender, "NOT_AUTHORIZED");
     }
 }
