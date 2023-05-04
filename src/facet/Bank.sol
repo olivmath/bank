@@ -2,25 +2,25 @@
 pragma solidity ^0.8.18;
 
 import {Token} from "./Token.sol";
-import "../diamont/Diamond.Storage.Lib.sol";
+import {DiamondStorageLib} from "../diamont/Lib.sol";
+import "../../lib/forge-std/src/console.sol";
 
 contract Bank {
     using DiamondStorageLib for DiamondStorageLib.Storage;
 
-    address public token;
-
     constructor(address _token) {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
 
-        ds.controller = msg.sender;
-        token = _token;
+        ds.token = _token;
     }
 
-    modifier onlyController() {
+    function onlyController() internal view {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
 
-        require(msg.sender == ds.controller, "NOT_AUTHORIZED");
-        _;
+        console.log("caller", msg.sender);
+        console.log("controller", ds.controller);
+
+        require(ds.controller == msg.sender, "NOT_AUTHORIZED");
     }
 
     /**
@@ -28,7 +28,8 @@ contract Bank {
      * @param _employee address of the new employee
      * @param _budge budge amount for the employee
      */
-    function createEmployee(address _employee, uint256 _budge) public onlyController {
+    function createEmployee(address _employee, uint256 _budge) public {
+        onlyController();
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
 
         require(ds.employees[_employee].employee == address(0), "Employee already exists.");
@@ -41,7 +42,8 @@ contract Bank {
      * @param _employee address of the employee to be updated
      * @param _budge new budge amount for the employee
      */
-    function updateEmployee(address _employee, uint256 _budge) public onlyController {
+    function updateEmployee(address _employee, uint256 _budge) public {
+        onlyController();
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
 
         require(ds.employees[_employee].employee != address(0), "Employee does not exist.");
@@ -52,7 +54,8 @@ contract Bank {
      * @dev Delete an employee
      * @param _employee address of the employee to be deleted
      */
-    function deleteEmployee(address _employee) public onlyController {
+    function deleteEmployee(address _employee) public {
+        onlyController();
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
 
         require(ds.employees[_employee].employee != address(0), "Employee does not exist.");
