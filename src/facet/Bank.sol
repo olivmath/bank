@@ -3,7 +3,6 @@ pragma solidity ^0.8.18;
 
 import {Token} from "./Token.sol";
 import {DiamondStorageLib} from "../diamont/Lib.sol";
-import "../../lib/forge-std/src/console.sol";
 
 contract Bank {
     using DiamondStorageLib for DiamondStorageLib.Storage;
@@ -16,9 +15,6 @@ contract Bank {
 
     function onlyController() internal view {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
-
-        console.log("caller", msg.sender);
-        console.log("controller", ds.controller);
 
         require(ds.controller == msg.sender, "NOT_AUTHORIZED");
     }
