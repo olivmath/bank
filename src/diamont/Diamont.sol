@@ -1,10 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import "./Cut.sol";
 import "./Loupe.sol";
+import "./Cut.sol";
+import "./Lib.sol";
 
 contract Diamond is DiamondCut, DiamondLoupe {
+
+    constructor() {
+        DiamondStorageLib.setController(msg.sender);
+    }
+
     receive() external payable {}
 
     fallback() external payable {
