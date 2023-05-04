@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import "./Diamond.Storage.Lib.sol";
+import "./Lib.sol";
 import "./interfaces/ILoupe.sol";
 
 contract DiamondLoupe is IDiamondLoupe {
