@@ -6,7 +6,6 @@ import "./Cut.sol";
 import "./Lib.sol";
 
 contract Diamond is DiamondCut, DiamondLoupe {
-
     constructor() {
         DiamondStorageLib.setController(msg.sender);
     }

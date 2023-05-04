@@ -66,6 +66,8 @@ contract BaseSetup is Test {
         });
 
         diamondCut.push(bankFaucet);
+
+        vm.prank(controller);
         diamond.diamondCut(diamondCut, address(0), new bytes(0));
     }
 
@@ -77,7 +79,9 @@ contract BaseSetup is Test {
     }
 
     ///
-    function createUsers(uint256 userNum) private returns (address payable[] memory) {
+    function createUsers(
+        uint256 userNum
+    ) private returns (address payable[] memory) {
         address payable[] memory users = new address payable[](userNum);
         for (uint256 i = 0; i < userNum; i++) {
             address payable user = getNextUserAddress();

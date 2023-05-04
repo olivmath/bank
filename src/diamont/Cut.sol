@@ -50,6 +50,8 @@ contract DiamondCut is IDiamondCut {
     // essa funcao eh responsavel por 'cortar o diamante'
     // isso significa que posso adicionar/editar/remover uma face (contrato) do diamante
     function diamondCut(FacetCut[] memory _diamondCut, address _constructor, bytes memory _calldata) external {
+        DiamondStorageLib.onlyController();
+
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
         //
         //
