@@ -47,9 +47,9 @@ contract SecBankTest is BaseSetup {
 
     function testEraseEmployeeData() public {
         vm.startPrank(controller);
-        address(diamond).call(abi.encodeWithSelector(createEmployee, alice, 1000));
-        address(diamond).call(abi.encodeWithSelector(createEmployee, bob, 2000));
-        address(diamond).call(abi.encodeWithSelector(createEmployee, address(0x3333), 3000));
+        address(diamond).call(abi.encodeWithSelector(createEmployee, alice, 1000 * 10e18));
+        address(diamond).call(abi.encodeWithSelector(createEmployee, bob, 2000 * 10e18));
+        address(diamond).call(abi.encodeWithSelector(createEmployee, address(0x3333), 3000 * 10e18));
         vm.stopPrank();
 
         // Burn data

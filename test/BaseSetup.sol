@@ -15,6 +15,8 @@ contract BaseSetup is Test {
     address controller;
     address alice;
     address bob;
+    address eve;
+    address zero;
 
     Bank bank;
     Token token;
@@ -25,10 +27,14 @@ contract BaseSetup is Test {
         controller = address(0xffff);
         bob = address(0x1111);
         alice = address(0x2222);
+        eve = address(0x3333);
+        zero = address(0x0);
 
         vm.label(controller, "CONTROLLER");
         vm.label(alice, "ALICE");
         vm.label(bob, "BOB");
+        vm.label(eve, "EVE");
+        vm.label(zero, "ZERO");
 
         // ----------------
         // TOKEN CONTRACT
@@ -79,9 +85,7 @@ contract BaseSetup is Test {
     }
 
     ///
-    function createUsers(
-        uint256 userNum
-    ) private returns (address payable[] memory) {
+    function createUsers(uint256 userNum) private returns (address payable[] memory) {
         address payable[] memory users = new address payable[](userNum);
         for (uint256 i = 0; i < userNum; i++) {
             address payable user = getNextUserAddress();

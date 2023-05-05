@@ -2,11 +2,14 @@
 pragma solidity ^0.8.18;
 
 library DiamondStorageLib {
+    // Approximately 200 blocks per hour, 4800 blocks per day, and 144000 blocks per month
+    uint256 constant LOCKTIME_IN_BLOCKS = 144000;
     bytes32 constant DIAMOND_STORAGE_POSITION = keccak256("diamond.storage");
 
     struct Employee {
         address employee;
         uint256 budge;
+        uint256 locktime;
     }
 
     struct Storage {
