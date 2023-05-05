@@ -56,12 +56,18 @@ contract BaseSetup is Test {
         // 0x6e7c4ab1  =>  deleteEmployee(address)
         // 0xe3366fed  =>  getAllEmployees() -> address[] memory
         // 0x32648e09  =>  getEmployee(address) -> (address, uint256)
-        bytes4[] memory selectors = new bytes4[](5);
+        // 0x809e9ef5  =>  payAllEmployees()
+        // 0x12065fe0  =>  getBalance()
+        // 0x1e153139  =>  getTotalEmployeeCost()
+        bytes4[] memory selectors = new bytes4[](8);
         selectors[0] = Bank.createEmployee.selector;
         selectors[1] = Bank.updateEmployee.selector;
         selectors[2] = Bank.deleteEmployee.selector;
         selectors[3] = Bank.getEmployee.selector;
         selectors[4] = Bank.getAllEmployees.selector;
+        selectors[5] = Bank.payAllEmployees.selector;
+        selectors[6] = Bank.getBalance.selector;
+        selectors[7] = Bank.getTotalEmployeeCost.selector;
         vm.prank(controller);
         bank = new Bank(address(token));
 
