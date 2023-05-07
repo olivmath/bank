@@ -38,7 +38,7 @@ contract Bank {
 
         require(ds.employees[_employee].employee == address(0), "Employee already exists.");
         uint256 employeeLocktime = block.number + DiamondStorageLib.LOCKTIME_IN_BLOCKS;
-        ds.employees[_employee] = DiamondStorageLib.Employee(_employee, _budge, employeeLocktime);
+        ds.employees[_employee] = DiamondStorageLib.Employee(_employee, _budge, employeeLocktime, 0);
         ds.employeeList.push(_employee);
     }
 
@@ -91,11 +91,11 @@ contract Bank {
      * @dev Get a employee
      * @return address and budge of a employee
      */
-    function getEmployee(address employee) public view returns (address, uint256) {
+    function getEmployee(address employee) public view returns (address, uint256, uint256) {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
 
         DiamondStorageLib.Employee memory emp = ds.employees[employee];
-        return (emp.employee, emp.budge);
+        return (emp.employee, emp.budge, emp.bonus);
     }
 
     /**
@@ -118,7 +118,7 @@ contract Bank {
         for (uint256 i = 0; i < ds.employeeList.length; i++) {
             address employeeAddress = ds.employeeList[i];
             DiamondStorageLib.Employee memory emp = ds.employees[employeeAddress];
-            totalCost += emp.budge;
+            totalCost += emp.budge + emp.bonus;
         }
     }
 
@@ -128,17 +128,29 @@ contract Bank {
     function payAllEmployees() public {
         onlyController();
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
-        Token token = Token(ds.token);
+        token = Token(ds.token);
+        DiamondStorageLib.Employee memory emp;
+        uint256 contractBalance = token.balanceOf(address(this));
 
         for (uint256 i = 0; i < ds.employeeList.length; i++) {
-            address employeeAddress = ds.employeeList[i];
-            DiamondStorageLib.Employee storage employee = ds.employees[employeeAddress];
+            address employee = ds.employeeList[i];
+            emp = ds.employees[employee];
+            uint256 total = emp.budge + emp.bonus;
 
-            require(block.number >= employee.locktime, "Employee's locktime has not passed yet.");
-
-            require(token.transfer(employeeAddress, employee.budge), "Transfer failed.");
-
-            employee.locktime = block.number + DiamondStorageLib.LOCKTIME_IN_BLOCKS;
+            if (emp.locktime > block.number) {
+                continue;
+            } else if (total <= contractBalance) {
+                token.transfer(emp.employee, total);
+                unchecked {
+                    contractBalance -= emp.budge;
+                }
+            } else if (contractBalance > 0) {
+                emp.bonus += emp.budge - contractBalance;
+                token.transfer(emp.employee, contractBalance);
+                contractBalance = 0;
+            } else {
+                emp.bonus += emp.budge - contractBalance;
+            }
         }
     }
 }

@@ -115,11 +115,14 @@ contract PayEmployees is BaseBankTest {
         assertEq(token.balanceOf(bob), bobBudge * 2, "Bob should receive the payment");
     }
 
-    // function testEmployeeCostAfterPayment() public {
-    //     addEmployee();
-    //     uint256 costBefore = bank.getEmployeeCost();
-    //     bank.payEmployees();
-    //     uint256 costAfter = bank.getEmployeeCost();
-    //     Assert.equal(costBefore, costAfter, "Employee cost should not change after payment");
-    // }
+    function testPayAllEmployeesWithInsufficientBalance() public {
+        // adicionar novoEmployee com budge 99000
+        // chamar pagamento
+        // verificar se novoEmployee recebeu uma parte do apgamento
+        // verificar se novoEmployee tem bonus
+        // adicionar saldo no contrato
+        // chamar pagamento
+        // verificar se novoEmployee recebeu  pagamento + bonus
+        // verificar se novoEmployee bonus == 0
+    }
 }
