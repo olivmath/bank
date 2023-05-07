@@ -12,6 +12,10 @@ import {Token} from "./Token.sol";
 contract Bank {
     ERC20 token;
 
+    event Paid(address employee, uint256 budge);
+
+    event Bonus(address employee, uint256 bonus);
+
     using DiamondStorageLib for DiamondStorageLib.Storage;
 
     /**
