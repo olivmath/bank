@@ -117,12 +117,46 @@ contract PayEmployees is BaseBankTest {
 
     function testPayAllEmployeesWithInsufficientBalance() public {
         // adicionar novoEmployee com budge 99000
+        address newEmployee = address(0x1234);
+        uint256 newEmployeeBudge = 99000 * 10e18;
+
+        vm.prank(controller);
+        address(diamond).call(abi.encodeWithSelector(createEmployee, newEmployee, newEmployeeBudge));
+
+        // roll blocks
+        vm.roll(locktime);
+
         // chamar pagamento
+        vm.prank(controller);
+        address(diamond).call(abi.encodeWithSelector(payAllEmployees));
+
         // verificar se novoEmployee recebeu uma parte do apgamento
+        uint lastBalance = token.balanceOf(newEmployee);
+        assertEq(lastBalance, 90000 * 10e18, "New Employee should receive 90000 of payment");
+
         // verificar se novoEmployee tem bonus
+        (, bytes memory data) = address(diamond).call(abi.encodeWithSelector(getEmployee, newEmployee));
+        (, , uint256 bonus) = abi.decode(data, (address, uint256, uint256));
+        assertEq(bonus, 9000 * 10e18, "New Employee should have 9000 of bonus");
+
         // adicionar saldo no contrato
+        vm.prank(controller);
+        token.transfer(address(diamond), 118000 * 10e18);
+
         // chamar pagamento
+        vm.prank(controller);
+        address(diamond).call(abi.encodeWithSelector(payAllEmployees));
+
         // verificar se novoEmployee recebeu  pagamento + bonus
+        assertEq(
+            token.balanceOf(newEmployee),
+            9000 * 10e18 + newEmployeeBudge + lastBalance,
+            "New Employee should receive 99000 + 9000 of payment"
+        );
+
         // verificar se novoEmployee bonus == 0
+        (, data) = address(diamond).call(abi.encodeWithSelector(getEmployee, newEmployee));
+        (,, bonus) = abi.decode(data, (address, uint256, uint256));
+        assertEq(bonus, 0, "New Employee should have 0 of bonus");
     }
 }
