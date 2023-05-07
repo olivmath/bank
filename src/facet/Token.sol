@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity >=0.8.0;
 
+error NoBalance(address sender);
+
 /// @notice Modern and gas efficient ERC20 + EIP-2612 implementation.
 /// @author Solmate (https://github.com/transmissions11/solmate/blob/main/src/tokens/ERC20.sol)
 /// @author Modified from Uniswap (https://github.com/Uniswap/uniswap-v2-core/blob/master/contracts/UniswapV2ERC20.sol)
@@ -34,8 +36,6 @@ abstract contract ERC20 {
 
     mapping(address => mapping(address => uint256)) public allowance;
 
-    mapping(address => uint256) public nonces;
-
     /*//////////////////////////////////////////////////////////////
                                CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
@@ -59,6 +59,8 @@ abstract contract ERC20 {
     }
 
     function transfer(address to, uint256 amount) public virtual returns (bool) {
+        if (balanceOf[msg.sender] < amount) revert NoBalance(msg.sender);
+
         balanceOf[msg.sender] -= amount;
 
         // Cannot overflow because the sum of all user
@@ -76,6 +78,8 @@ abstract contract ERC20 {
         uint256 allowed = allowance[from][msg.sender]; // Saves gas for limited approvals.
 
         if (allowed != type(uint256).max) allowance[from][msg.sender] = allowed - amount;
+
+        if (balanceOf[msg.sender] < amount) revert NoBalance(msg.sender);
 
         balanceOf[from] -= amount;
 
