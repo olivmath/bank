@@ -13,6 +13,8 @@ contract PayEmployees is BaseBankTest {
         address(diamond).call(abi.encodeWithSelector(createEmployee, alice, aliceBudge));
         address(diamond).call(abi.encodeWithSelector(createEmployee, bob, bobBudge));
         address(diamond).call(abi.encodeWithSelector(createEmployee, eve, eveBudge));
+
+        token.transfer(address(diamond), 100000 * 10e18);
         vm.stopPrank();
     }
 
@@ -34,10 +36,14 @@ contract PayEmployees is BaseBankTest {
     }
 
     function testPayEmployees() public {
-        uint256 balanceBefore = token.balanceOf(address(bank));
-        vm.startPrank(controller);
+        (, bytes memory data) = address(diamond).call(abi.encodeWithSelector(getBalance));
+        uint256 balanceBefore = abi.decode(data, (uint256));
+
+        vm.roll(locktime);
+
+        vm.prank(controller);
         address(diamond).call(abi.encodeWithSelector(payAllEmployees));
-        uint256 balanceAfter = token.balanceOf(address(bank));
+        uint256 balanceAfter = token.balanceOf(address(diamond));
 
         assertEq(token.balanceOf(alice), aliceBudge, "Alicee did not receive correct budge.");
         assertEq(token.balanceOf(bob), bobBudge, "Bob did not receive correct budge.");
@@ -50,74 +56,64 @@ contract PayEmployees is BaseBankTest {
     }
 
     function testAddFunds() public {
-        uint256 amountToAdd = 100;
-        uint256 balanceBefore = token.balanceOf(address(bank));
+        uint256 amountToAdd = 100 * 10e18;
+        uint256 balanceBefore = token.balanceOf(address(diamond));
+
         vm.prank(controller);
-        token.transfer(address(bank), amountToAdd);
-        uint256 balanceAfter = token.balanceOf(address(bank));
+        token.transfer(address(diamond), amountToAdd);
+        uint256 balanceAfter = token.balanceOf(address(diamond));
 
         assertEq(balanceAfter, balanceBefore + amountToAdd, "Bank balance did not increase by correct amount.");
     }
 
-    function addEmployee() public {
-        bank.createEmployee(address(this), 10);
-        employees.push(address(this));
-    }
-
     function testEmployeeCost() public {
-        addEmployee();
-        addEmployee();
-        uint256 cost = bank.getEmployeeCost();
-        Assert.equal(cost, 20, "Employee cost should be 20");
-        bank.deleteEmployee(address(this));
-        cost = bank.getEmployeeCost();
-        Assert.equal(cost, 10, "Employee cost should be 10");
+        (, bytes memory data) = address(diamond).call(abi.encodeWithSelector(getTotalEmployeeCost));
+        uint256 totalCost = abi.decode(data, (uint256));
+        assertEq(totalCost, aliceBudge + bobBudge + eveBudge, "Employees cust should be 6000");
     }
 
-    // function testPayEmployees() public {
-    //     token.transfer(address(bank), 50);
-    //     addEmployee();
-    //     uint256 oldBalance = token.balanceOf(address(employees[0]));
-    //     bank.payEmployees();
-    //     uint256 newBalance = token.balanceOf(address(employees[0]));
-    //     Assert.greaterThan(newBalance, oldBalance, "Employee should receive the payment");
-    // }
+    function testPayBobEmployee() public {
+        uint256 oldBalance = token.balanceOf(bob);
 
-    // function testRollBlocks() public {
-    //     addEmployee();
-    //     uint256 oldBalance = token.balanceOf(address(employees[1]));
-    //     uint256 startBlock = block.number;
-    //     while (block.number < startBlock + locktime) {
-    //         block.timestamp += 1 days;
-    //     }
-    //     bank.payEmployees();
-    //     uint256 newBalance = token.balanceOf(address(employees[1]));
-    //     Assert.equal(newBalance, oldBalance, "Employee should not receive the payment");
-    // }
+        vm.roll(locktime);
 
-    // function testPayNonexistentEmployee() public {
-    //     bool success = address(bank).call(abi.encodeWithSignature("payEmployee(address)", address(this)));
-    //     Assert.ok(!success, "Should not be possible to pay nonexistent employee");
-    // }
+        vm.prank(controller);
+        address(diamond).call(abi.encodeWithSelector(payAllEmployees));
 
-    // function testPayCompletedLocktimeEmployee() public {
-    //     addEmployee();
-    //     bank.payEmployees();
-    //     uint256 startBlock = block.number;
-    //     while (block.number < startBlock + locktime) {
-    //         block.timestamp += 1 days;
-    //     }
-    //     uint256 oldBalance = token.balanceOf(address(employees[2]));
-    //     bank.payEmployees();
-    //     uint256 newBalance = token.balanceOf(address(employees[2]));
-    //     Assert.greaterThan(newBalance, oldBalance, "Employee should receive the payment");
-    // }
+        uint256 newBalance = token.balanceOf(bob);
+        assertEq(newBalance, oldBalance + bobBudge, "Employee should receive the payment");
+    }
 
-    // function testPayEmployeesWithInsufficientBalance() public {
-    //     token.transfer(address(bank), 5);
-    //     bool success = address(bank).call(abi.encodeWithSignature("payEmployees()"));
-    //     Assert.ok(!success, "Should not be possible to pay employees with insufficient balance");
-    // }
+    function testRollBlocks() public {
+        address newEmployee = address(0x1234);
+        uint256 employeeBudge = 10 * 10e18;
+        vm.roll(locktime);
+
+        vm.prank(controller);
+        address(diamond).call(abi.encodeWithSelector(createEmployee, newEmployee, employeeBudge));
+        uint256 oldBalance = token.balanceOf(newEmployee);
+
+        (, bytes memory data) = address(diamond).call(abi.encodeWithSelector(getAllEmployees));
+        address[] memory employeeList = abi.decode(data, (address[]));
+        assertEq(employeeList.length, 4);
+
+        vm.prank(controller);
+        address(diamond).call(abi.encodeWithSelector(payAllEmployees));
+
+        uint256 newBalance = token.balanceOf(newEmployee);
+        assertEq(newBalance, oldBalance, "Employee should not receive the payment");
+
+        vm.roll(locktime * 2);
+
+        vm.prank(controller);
+        address(diamond).call(abi.encodeWithSelector(payAllEmployees));
+
+        newBalance = token.balanceOf(newEmployee);
+        assertEq(newBalance, oldBalance + employeeBudge, "Employee should receive the payment");
+        assertEq(token.balanceOf(alice), aliceBudge * 2, "Alice should receive the payment");
+        assertEq(token.balanceOf(eve), eveBudge * 2, "Eve should receive the payment");
+        assertEq(token.balanceOf(bob), bobBudge * 2, "Bob should receive the payment");
+    }
 
     // function testEmployeeCostAfterPayment() public {
     //     addEmployee();
