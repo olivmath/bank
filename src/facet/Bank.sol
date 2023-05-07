@@ -144,16 +144,23 @@ contract Bank {
             if (emp.locktime > block.number) {
                 continue;
             } else if (total <= contractBalance) {
+                ds.employees[emp.employee].locktime = block.number + DiamondStorageLib.LOCKTIME_IN_BLOCKS;
+                ds.employees[emp.employee].bonus = 0;
+                contractBalance -= total;
+
                 token.transfer(emp.employee, total);
-                unchecked {
-                    contractBalance -= emp.budge;
-                }
-            } else if (contractBalance > 0) {
-                emp.bonus += emp.budge - contractBalance;
-                token.transfer(emp.employee, contractBalance);
-                contractBalance = 0;
+                emit Paid(emp.employee, total);
             } else {
-                emp.bonus += emp.budge - contractBalance;
+                uint256 bonus = emp.budge - contractBalance;
+                ds.employees[emp.employee].bonus += bonus;
+
+                if (contractBalance > 0) {
+                    token.transfer(emp.employee, contractBalance);
+                    emit Paid(emp.employee, contractBalance);
+
+                    contractBalance = 0;
+                }
+                emit Bonus(emp.employee, bonus);
             }
         }
     }
