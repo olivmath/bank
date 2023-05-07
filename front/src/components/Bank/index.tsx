@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Address, createWalletClient, encodePacked, custom } from "viem";
 import { foundry } from "viem/chains";import "viem/window";
+import DiamondFunctions, { StaticCall } from "./DiamondFunctions";
 
 
 interface BankProp {
@@ -77,14 +78,11 @@ function Bank({ account }: BankProp) {
   };
 
   const renderButton = (
-    text: string,
-    funcSelector: string,
-    types: string[] = [],
-    values: any[] = []
+    diamontFunction: StaticCall
   ) => (
     <div>
-      <button onClick={() => handleButtonClick(funcSelector, types, values)}>
-        {text}
+      <button onClick={() => handleButtonClick(diamontFunction.selector, diamontFunction.types, diamontFunction.values)}>
+        {diamontFunction.name}
       </button>
     </div>
   );
@@ -95,35 +93,14 @@ function Bank({ account }: BankProp) {
     <>
       <div>Connected: {account}</div>
       <h1>Bank Contract</h1>
-      {renderButton(
-        "createEmployee",
-        "0x520a19c0",
-        ["bytes4", "address", "uint256"],
-        [employee, inputBudge]
-      )}
-      {renderButton(
-        "updateEmployee",
-        "0x5e91d8ec",
-        ["bytes4", "address", "uint256"],
-        [employee, inputBudge]
-      )}
-      {renderButton(
-        "deleteEmployee",
-        "0x6e7c4ab1",
-        ["bytes4", "address"],
-        [employee]
-      )}
-      {renderButton("getAllEmployees", "0xe3366fed", ["bytes4"])}
-      {renderButton(
-        "getEmployee",
-        "0x32648e09",
-        ["bytes4", "address"],
-        [employee]
-      )}
-      {renderButton("payAllEmployees", "0x809e9ef5", ["bytes4"])}
-      {renderButton("getBalance", "0x12065fe0", ["bytes4"])}
-      {renderButton("getTotalEmployeeCost", "0x1e153139", ["bytes4"])}
-
+      {renderButton(DiamondFunctions.createEmployee)}
+      {renderButton(DiamondFunctions.updateEmployee)}
+      {renderButton(DiamondFunctions.deleteEmployee)}
+      {renderButton(DiamondFunctions.getEmployee)}
+      {renderButton(DiamondFunctions.getAllEmployees)}
+      {renderButton(DiamondFunctions.getBalance)}
+      {renderButton(DiamondFunctions.getTotalEmployeeCost)}
+      {renderButton(DiamondFunctions.payAllEmployees)}
       {showInputs && (
         <div>
           {renderInputs()}
