@@ -131,12 +131,12 @@ contract PayEmployees is BaseBankTest {
         address(diamond).call(abi.encodeWithSelector(payAllEmployees));
 
         // verificar se novoEmployee recebeu uma parte do apgamento
-        uint lastBalance = token.balanceOf(newEmployee);
+        uint256 lastBalance = token.balanceOf(newEmployee);
         assertEq(lastBalance, 90000 * 10e18, "New Employee should receive 90000 of payment");
 
         // verificar se novoEmployee tem bonus
         (, bytes memory data) = address(diamond).call(abi.encodeWithSelector(getEmployee, newEmployee));
-        (, , uint256 bonus) = abi.decode(data, (address, uint256, uint256));
+        (,, uint256 bonus) = abi.decode(data, (address, uint256, uint256));
         assertEq(bonus, 9000 * 10e18, "New Employee should have 9000 of bonus");
 
         // adicionar saldo no contrato

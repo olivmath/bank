@@ -11,18 +11,31 @@ import {Token} from "./Token.sol";
  */
 contract Bank {
     ERC20 token;
+    /**
+     * @dev Emitted when an employee is paid their budge
+     * @param employee Address of the employee being paid
+     * @param budge Amount of budge paid to the employee
+     */
 
-    event Paid(address employee, uint256 budge);
+    event Paid(address indexed employee, uint256 budge);
 
-    event Bonus(address employee, uint256 bonus);
+    /**
+     * @dev Emitted when there's not enough balance to pay the full budge, and the remaining amount is added as a bonus
+     * @param employee Address of the employee receiving the bonus
+     * @param bonus Amount of bonus added to the employee's balance
+     */
+    event Bonus(address indexed employee, uint256 bonus);
 
     using DiamondStorageLib for DiamondStorageLib.Storage;
 
     /**
-     * @dev Initialize the bank contract with a token address
+     * @dev Initialize the bank contract
      */
     constructor() {}
 
+    /**
+     * @notice Modifier to restrict function access to controller only
+     */
     function onlyController() internal view {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
 
@@ -30,9 +43,10 @@ contract Bank {
     }
 
     /**
-     * @dev Create a new employee
-     * @param _employee address of the new employee
-     * @param _budge budge amount for the employee
+     * @notice Creates a new employee with the provided budge
+     * @dev Create a new employee with `locktime` from the current block
+     * @param _employee Address of the new employee
+     * @param _budge Budge amount for the employee
      */
     function createEmployee(address _employee, uint256 _budge) public {
         onlyController();
@@ -47,9 +61,10 @@ contract Bank {
     }
 
     /**
+     * @notice Updates an employee's budge
      * @dev Update an employee's information
-     * @param _employee address of the employee to be updated
-     * @param _budge new budge amount for the employee
+     * @param _employee Address of the employee to be updated
+     * @param _budge New budge amount for the employee
      */
     function updateEmployee(address _employee, uint256 _budge) public {
         onlyController();
@@ -61,8 +76,9 @@ contract Bank {
     }
 
     /**
+     * @notice Deletes an employee from the contract
      * @dev Delete an employee
-     * @param _employee address of the employee to be deleted
+     * @param _employee Address of the employee to be deleted
      */
     function deleteEmployee(address _employee) public {
         onlyController();
@@ -82,6 +98,7 @@ contract Bank {
     }
 
     /**
+     * @notice Returns the list of all employee addresses
      * @dev Get the list of all employees
      * @return employees array containing addresses of all employees
      */
@@ -92,18 +109,26 @@ contract Bank {
     }
 
     /**
-     * @dev Get a employee
-     * @return address and budge of a employee
+     * @notice Returns the details of a specific employee
+     * @dev Retrieves employee information including address, budge, and bonus
+     * @param _employee Address of the employee
+     * @return employee Address of the employee that will receive payment
+     * @return budge Normal cash amount that will be paid to the employee
+     * @return bonus Amount added as a bonus when there's not enough balance to pay the full budge
      */
-    function getEmployee(address employee) public view returns (address, uint256, uint256) {
+    function getEmployee(address _employee) public view returns (address employee, uint256 budge, uint256 bonus) {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
 
-        DiamondStorageLib.Employee memory emp = ds.employees[employee];
-        return (emp.employee, emp.budge, emp.bonus);
+        DiamondStorageLib.Employee memory emp = ds.employees[_employee];
+
+        employee = emp.employee;
+        budge = emp.budge;
+        bonus = emp.bonus;
     }
 
     /**
-     * @dev Get the token balance of the bank
+     * @notice Returns the token balance of the bank
+     * @dev Call token contract with bank address end return balance
      * @return balance The token balance of the bank
      */
     function getBalance() public returns (uint256 balance) {
@@ -113,8 +138,9 @@ contract Bank {
     }
 
     /**
-     * @dev Get the total cost of all employees
-     * @return totalCost of all employees
+     * @notice Calculates the total cost of all employees
+     * @dev Sums the combined budgets and bonuses of all employees
+     * @return totalCost Total cost of all employees
      */
     function getTotalEmployeeCost() public view returns (uint256 totalCost) {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
@@ -128,6 +154,10 @@ contract Bank {
 
     /**
      * @dev Pay all employees their respective budgets
+     * @dev Iterates through all employees, checking if their locktime has expired
+     * @dev If locktime has expired and there's enough contract balance, transfers the employee's budget and bonus, and resets their locktime and bonus
+     * @dev If there's not enough balance, the remaining balance is transferred, and the rest is added to the employee's bonus
+     * @dev If there's no contract balance, the entire budget is added to the employee's bonus
      */
     function payAllEmployees() public {
         onlyController();
