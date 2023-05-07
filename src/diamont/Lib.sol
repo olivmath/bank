@@ -10,6 +10,7 @@ library DiamondStorageLib {
         address employee;
         uint256 budge;
         uint256 locktime;
+        uint256 bonus;
     }
 
     struct Storage {
@@ -38,6 +39,11 @@ library DiamondStorageLib {
 
     function controller() internal view returns (address) {
         return getDiamondStorage().controller;
+    }
+
+    function setToken(address newToken) public {
+        Storage storage ds = getDiamondStorage();
+        ds.token = newToken;
     }
 
     function token() internal view returns (address) {

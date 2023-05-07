@@ -46,7 +46,7 @@ contract BaseSetup is Test {
         // DIAMOND CONTRACT
         // ----------------
         vm.prank(controller);
-        diamond = new Diamond();
+        diamond = new Diamond(address(token));
 
         // ----------------
         // BANK CONTRACT
@@ -69,7 +69,7 @@ contract BaseSetup is Test {
         selectors[6] = Bank.getBalance.selector;
         selectors[7] = Bank.getTotalEmployeeCost.selector;
         vm.prank(controller);
-        bank = new Bank(address(token));
+        bank = new Bank();
 
         IDiamondCut.FacetCut memory bankFaucet = IDiamondCut.FacetCut({
             facetAddress: address(bank),

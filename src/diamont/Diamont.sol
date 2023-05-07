@@ -6,8 +6,9 @@ import "./Cut.sol";
 import "./Lib.sol";
 
 contract Diamond is DiamondCut, DiamondLoupe {
-    constructor() {
+    constructor(address token) {
         DiamondStorageLib.setController(msg.sender);
+        DiamondStorageLib.setToken(token);
     }
 
     receive() external payable {}

@@ -1,25 +1,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {Token} from "./Token.sol";
 import {DiamondStorageLib} from "../diamont/Lib.sol";
+import {ERC20} from "../facet/Token.sol";
+import {Token} from "./Token.sol";
 
 /**
  * @title Bank
  * @notice A contract to manage employee budgets using the Diamond Storage Library
  */
 contract Bank {
+    ERC20 token;
+
     using DiamondStorageLib for DiamondStorageLib.Storage;
 
     /**
      * @dev Initialize the bank contract with a token address
-     * @param _token The address of the token to be used
      */
-    constructor(address _token) {
-        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
-
-        ds.token = _token;
-    }
+    constructor() {}
 
     function onlyController() internal view {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
@@ -104,9 +102,9 @@ contract Bank {
      * @dev Get the token balance of the bank
      * @return balance The token balance of the bank
      */
-    function getBalance() public view returns (uint256 balance) {
+    function getBalance() public returns (uint256 balance) {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
-        Token token = Token(ds.token);
+        token = Token(ds.token);
         balance = token.balanceOf(address(this));
     }
 
