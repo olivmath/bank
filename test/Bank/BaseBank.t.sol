@@ -41,8 +41,10 @@ contract BaseBankTest is BaseSetup {
         getTotalEmployeeCost = 0x1e153139;
 
         bobBudge = 5000 * 10e18;
-        aliceBudge = 20 * 10e18;
-        eveBudge = 30 * 10e18;
+        aliceBudge = 2000 * 10e18;
+        eveBudge = 3000 * 10e18;
+
+        locktime = 144001;
 
         BaseSetup.setUp();
     }
