@@ -104,7 +104,7 @@ export function FunctionSelector({ selector, account }: FunctionSelectorProps) {
           }
           disabled={isButtonDisabled}
         >
-          Send
+          {isButtonDisabled ? "Fill the params!" : "Send"}
         </styles.SendButton>
       </styles.ParamsWrapper>
       {receipt && <TxDisplay receipt={receipt} />}
