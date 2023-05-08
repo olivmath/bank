@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styles from "./styles";
-import { StaticCall } from "../selectors";
+import { StaticCall } from "../../../config/selectors";
 
 interface FunctionSelectorProps {
   selector: StaticCall;

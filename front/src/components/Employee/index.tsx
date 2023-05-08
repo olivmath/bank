@@ -1,5 +1,6 @@
 import React from "react";
 import { Address } from "viem";
+import Styles from "./styles";
 
 interface EmployeeProps {
   account: Address;
@@ -11,10 +12,14 @@ function Employees({ account }: EmployeeProps) {
 
   return (
     <>
-      <div>Connected: {account}</div>
-      <h1>Employee {account}</h1>
-      <p>Your budge: {budge}</p>
-      <p>Have bonus: {bonus}</p>
+      <div>
+        <Styles.ConnectedAccount>
+          Connected: {account}
+        </Styles.ConnectedAccount>
+        <Styles.Title>Employee {account}</Styles.Title>
+        <Styles.Info>Your budge: {budge}</Styles.Info>
+        <Styles.Info>Have bonus: {bonus}</Styles.Info>
+      </div>
     </>
   );
 }

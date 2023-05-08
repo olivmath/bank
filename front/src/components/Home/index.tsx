@@ -1,21 +1,12 @@
 import React, { useState } from "react";
-import {
-  Address,
-  createPublicClient,
-  createWalletClient,
-  custom,
-  http,
-} from "viem";
+import { Address, createWalletClient, custom } from "viem";
 import { foundry } from "viem/chains";
 import "viem/window";
 import Employee from "../Employee";
 import Bank from "../Bank";
+import styles from "./styles";
 
 const CONTROLLER = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
-const publicClient = createPublicClient({
-  chain: foundry,
-  transport: http(),
-});
 
 const walletClient = createWalletClient({
   chain: foundry,
@@ -31,7 +22,7 @@ function Home() {
   };
 
   return (
-    <>
+    <div>
       {account ? (
         account === CONTROLLER ? (
           <Bank account={account} />
@@ -39,9 +30,11 @@ function Home() {
           <Employee account={account} />
         )
       ) : (
-        <button onClick={connect}>Connect Wallet</button>
+        <styles.ConnectButton onClick={connect}>
+          Connect Wallet
+        </styles.ConnectButton>
       )}
-    </>
+    </div>
   );
 }
 

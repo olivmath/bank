@@ -1,27 +1,22 @@
 import React, { useState } from "react";
 import { Address, createWalletClient, encodePacked, custom } from "viem";
-import { foundry } from "viem/chains";import "viem/window";
-import DiamondFunctions, { StaticCall } from "./selectors";
+import { foundry } from "viem/chains";
+import "viem/window";
 import { FunctionSelector } from "./FunctionSelector";
-import selectors from "./selectors";
-
+import selectors from "../../config/selectors";
+import styles from "./styles";
 
 interface BankProp {
   account: Address;
 }
 
 const walletClient = createWalletClient({
-    chain: foundry,
-    transport: custom(window.ethereum!),
-  });
-  
+  chain: foundry,
+  transport: custom(window.ethereum!),
+});
 
 function Bank({ account }: BankProp) {
   // STATES
-
-  const [inputTypes, setInputTypes] = useState<Address[]>([]);
-  const [employee, setEmployee] = useState<Address>();
-  const [inputBudge, setInputBudge] = useState(0);
   const contractAddress: Address = "0x1234";
 
   // FUNCTIONS
@@ -39,12 +34,11 @@ function Bank({ account }: BankProp) {
     });
   };
 
-
   // COMPONENT
 
   return (
     <>
-      <div>Connected: {account}</div>
+      <styles.ConnectedAccount>Connected: {account}</styles.ConnectedAccount>
       <h1>Bank Contract</h1>
       <FunctionSelector selector={selectors.createEmployee}></FunctionSelector>
       <FunctionSelector selector={selectors.updateEmployee}></FunctionSelector>
@@ -52,7 +46,9 @@ function Bank({ account }: BankProp) {
       <FunctionSelector selector={selectors.getEmployee}></FunctionSelector>
       <FunctionSelector selector={selectors.getAllEmployees}></FunctionSelector>
       <FunctionSelector selector={selectors.getBalance}></FunctionSelector>
-      <FunctionSelector selector={selectors.getTotalEmployeeCost}></FunctionSelector>
+      <FunctionSelector
+        selector={selectors.getTotalEmployeeCost}
+      ></FunctionSelector>
       <FunctionSelector selector={selectors.payAllEmployees}></FunctionSelector>
     </>
   );
