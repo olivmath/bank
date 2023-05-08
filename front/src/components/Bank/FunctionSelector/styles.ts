@@ -33,16 +33,16 @@ export default {
   `,
   SendButton: styled.button`
     padding: 6px 12px;
-    background-color: #007bff;
+    background-color: ${({ disabled }) => (disabled ? "#ccc" : "#007bff")};
     color: #fff;
-    border: 1px solid #007bff;
+    border: 1px solid ${({ disabled }) => (disabled ? "#ccc" : "#007bff")};
     border-radius: 4px;
-    cursor: pointer;
+    cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
     transition: background-color 0.2s;
 
     &:hover {
-      background-color: #0056b3;
-      border-color: #0056b3;
+      background-color: ${({ disabled }) => (disabled ? "#ccc" : "#0056b3")};
+      border-color: ${({ disabled }) => (disabled ? "#ccc" : "#0056b3")};
     }
   `,
 };
