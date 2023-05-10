@@ -72,7 +72,6 @@ export function FunctionSelector({ selector, account }: FunctionSelectorProps) {
     values: any[]
   ) => {
     const data = encodePacked(types, [funcSelector, ...values]);
-
     const hash = await walletClient.sendTransaction({
       to: contractAddress,
       account,
@@ -94,7 +93,10 @@ export function FunctionSelector({ selector, account }: FunctionSelectorProps) {
             <styles.Input
               type="text"
               placeholder={`Enter ${selector.types[index + 1]}`}
-              onChange={(e) => handleInputChange(index, e.target.value)}
+              onChange={(e) => {
+                console.log(e.target.value);
+                handleInputChange(index, e.target.value);
+              }}
             />
           </styles.InputWrapper>
         ))}
