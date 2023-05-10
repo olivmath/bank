@@ -1,2 +1,2 @@
-# Contract Writes Example
+# Bank User Interface
 
