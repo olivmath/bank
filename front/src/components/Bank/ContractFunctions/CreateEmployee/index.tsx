@@ -1,4 +1,8 @@
+import contracts from "../../../../config/contracts";
 import React, { useState, useEffect } from "react";
+import { TxDisplay } from "../../TxDisplay";
+import { foundry } from "viem/chains";
+import styles from "../styles";
 import {
   Address,
   Hash,
@@ -7,10 +11,6 @@ import {
   WalletClient,
   parseUnits,
 } from "viem";
-import { TxDisplay } from "../../TxDisplay";
-import styles from "../styles";
-import contracts from "../../../../config/contracts";
-import { foundry } from "viem/chains";
 
 interface CreateEmployeeProps {
   account: Address;
@@ -18,43 +18,43 @@ interface CreateEmployeeProps {
   walletClient: WalletClient;
 }
 
-export default function ({
+export default function CreateEmployee({
   account,
   publicClient,
   walletClient,
 }: CreateEmployeeProps) {
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
-  const [receipt, setReceipt] = useState<TransactionReceipt>();
-  const [employee, setEmployee] = useState<string>();
-  const [budge, setBudge] = useState<string>();
-  const [hash, setHash] = useState<Hash>();
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [receipt, setReceipt] = useState<TransactionReceipt | undefined>();
+  const [employee, setEmployee] = useState<string>("");
+  const [budge, setBudge] = useState<string>("");
+  const [hash, setHash] = useState<Hash | undefined>();
 
   useEffect(() => {
-    const truth = [employee, budge].every(
-      (value) => value !== undefined && value !== ""
-    );
-    setIsButtonDisabled(!truth);
+    setIsButtonDisabled(!(employee && budge));
   }, [employee, budge]);
 
   useEffect(() => {
-    (async () => {
+    const fetchReceipt = async () => {
       if (hash) {
         const receipt = await publicClient.waitForTransactionReceipt({ hash });
         setReceipt(receipt);
       }
-    })();
-  }, [hash]);
+    };
+
+    fetchReceipt();
+  }, [hash, publicClient]);
 
   const callFunction = async () => {
+    const parsedBudge = parseUnits(budge, 18);
     const hash = await walletClient.writeContract({
       address: contracts.diamond.address,
       abi: contracts.facet_bank.abi,
       functionName: "createEmployee",
-      args: [employee, parseUnits(budge, 18)],
+      args: [employee, parsedBudge],
       chain: foundry,
       account,
     });
-    setHash(hash as Hash);
+    setHash(hash);
   };
 
   return (
@@ -66,9 +66,8 @@ export default function ({
           <styles.InputText
             type="text"
             placeholder={"0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"}
-            onChange={(e) => {
-              setEmployee(e.target.value);
-            }}
+            value={employee}
+            onChange={(e) => setEmployee(e.target.value)}
           />
         </styles.InputWrapper>
         <styles.InputWrapper>
@@ -76,15 +75,11 @@ export default function ({
           <styles.Input
             type="text"
             placeholder={"1000"}
-            onChange={(e) => {
-              setBudge(e.target.value);
-            }}
+            value={budge}
+            onChange={(e) => setBudge(e.target.value)}
           />
         </styles.InputWrapper>
-        <styles.SendButton
-          onClick={() => callFunction()}
-          disabled={isButtonDisabled}
-        >
+        <styles.SendButton onClick={callFunction} disabled={isButtonDisabled}>
           {isButtonDisabled ? "Fill the params!" : "Send"}
         </styles.SendButton>
       </styles.ParamsWrapper>

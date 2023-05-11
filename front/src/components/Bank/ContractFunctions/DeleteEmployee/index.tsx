@@ -1,4 +1,8 @@
+import contracts from "../../../../config/contracts";
 import React, { useState, useEffect } from "react";
+import { TxDisplay } from "../../TxDisplay";
+import { foundry } from "viem/chains";
+import styles from "../styles";
 import {
   Address,
   Hash,
@@ -6,10 +10,6 @@ import {
   TransactionReceipt,
   WalletClient,
 } from "viem";
-import { TxDisplay } from "../../TxDisplay";
-import styles from "../styles";
-import contracts from "../../../../config/contracts";
-import { foundry } from "viem/chains";
 
 interface CreateEmployeeProps {
   account: Address;
@@ -17,31 +17,30 @@ interface CreateEmployeeProps {
   walletClient: WalletClient;
 }
 
-export default function ({
+export default function CreateEmployee({
   account,
   publicClient,
   walletClient,
 }: CreateEmployeeProps) {
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
-  const [receipt, setReceipt] = useState<TransactionReceipt>();
-  const [employee, setEmployee] = useState<string>();
-  const [hash, setHash] = useState<Hash>();
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [receipt, setReceipt] = useState<TransactionReceipt | undefined>();
+  const [employee, setEmployee] = useState<string>("");
+  const [hash, setHash] = useState<Hash | undefined>();
 
   useEffect(() => {
-    const truth = [employee].every(
-      (value) => value !== undefined && value !== ""
-    );
-    setIsButtonDisabled(!truth);
+    setIsButtonDisabled(!employee);
   }, [employee]);
 
   useEffect(() => {
-    (async () => {
+    const fetchReceipt = async () => {
       if (hash) {
         const receipt = await publicClient.waitForTransactionReceipt({ hash });
         setReceipt(receipt);
       }
-    })();
-  }, [hash]);
+    };
+
+    fetchReceipt();
+  }, [hash, publicClient]);
 
   const callFunction = async () => {
     const hash = await walletClient.writeContract({
@@ -52,7 +51,7 @@ export default function ({
       chain: foundry,
       account,
     });
-    setHash(hash as Hash);
+    setHash(hash);
   };
 
   return (
@@ -64,15 +63,11 @@ export default function ({
           <styles.InputText
             type="text"
             placeholder={"0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"}
-            onChange={(e) => {
-              setEmployee(e.target.value);
-            }}
+            value={employee}
+            onChange={(e) => setEmployee(e.target.value)}
           />
         </styles.InputWrapper>
-        <styles.SendButton
-          onClick={() => callFunction()}
-          disabled={isButtonDisabled}
-        >
+        <styles.SendButton onClick={callFunction} disabled={isButtonDisabled}>
           {isButtonDisabled ? "Fill the params!" : "Send"}
         </styles.SendButton>
       </styles.ParamsWrapper>
