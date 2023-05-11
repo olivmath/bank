@@ -31,6 +31,11 @@ export default function Bank({
 
   useEffect(() => {
     async function getAllEmployees() {
+      const data = await publicClient.readContract({
+        abi: contracts.facet_bank.abi,
+        address: contracts.diamond.address,
+        functionName: "getAllEmployees",
+      });
       const employeePromises = await Promise.all(
         data.map(async (emplAddr) => {
           const empl = await publicClient.readContract({
