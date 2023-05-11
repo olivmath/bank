@@ -1,4 +1,4 @@
-import CreateEmployee from "./FunctionSelector/CreateEmployee";
+import CreateEmployee from "./ContractFunctions/CreateEmployee";
 import { Address, PublicClient, WalletClient } from "viem";
 import styles from "./styles";
 import React from "react";
