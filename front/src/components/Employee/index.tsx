@@ -28,8 +28,6 @@ function Employees({ account }: EmployeeProps) {
         args: [account],
       });
 
-      console.log(data);
-
       setEmployeeData({
         budge: formatUnits(data[1], 18),
         bonus: formatUnits(data[2], 18),
