@@ -1,4 +1,9 @@
 import React, { useState } from "react";
+import { foundry } from "viem/chains";
+import Employee from "../Employee";
+import styles from "./styles";
+import Bank from "../Bank";
+import "viem/window";
 import {
   Address,
   createPublicClient,
@@ -6,11 +11,6 @@ import {
   custom,
   http,
 } from "viem";
-import { foundry } from "viem/chains";
-import "viem/window";
-import Employee from "../Employee";
-import Bank from "../Bank";
-import styles from "./styles";
 
 const CONTROLLER = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
 
@@ -24,8 +24,8 @@ const walletClient = createWalletClient({
   transport: custom(window.ethereum!),
 });
 
-function Home() {
-  const [account, setAccount] = useState<Address>();
+export default function () {
+  const [account, setAccount] = useState<Address | null>(null);
 
   const connect = async () => {
     const [address] = await walletClient.requestAddresses();
@@ -52,5 +52,3 @@ function Home() {
     </div>
   );
 }
-
-export default Home;
