@@ -51,6 +51,10 @@ function Bank({ account }: BankProp) {
         account={account}
         selector={selectors.deleteEmployee}
       ></FunctionSelector>
+      <FunctionSelector
+        account={account}
+        selector={selectors.getEmployee}
+      ></FunctionSelector>
     </>
   );
 }
