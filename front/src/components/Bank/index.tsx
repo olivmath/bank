@@ -1,4 +1,6 @@
 import CreateEmployee from "./ContractFunctions/CreateEmployee";
+import UpdateEmployee from "./ContractFunctions/UpdateEmployee";
+import DeleteEmployee from "./ContractFunctions/DeleteEmployee";
 import { Address, PublicClient, WalletClient } from "viem";
 import styles from "./styles";
 import React from "react";
@@ -45,10 +47,16 @@ function Bank({ account, publicClient, walletClient }: BankProp) {
         publicClient={publicClient}
         walletClient={walletClient}
       />
-      {/* <CreateEmployee />
-      <UpdateEmployee />
-      <DeleteEmployee />
-      <GetEmployee /> */}
+      <UpdateEmployee
+        account={account}
+        publicClient={publicClient}
+        walletClient={walletClient}
+      />
+      <DeleteEmployee
+        account={account}
+        publicClient={publicClient}
+        walletClient={walletClient}
+      />
     </>
   );
 }
