@@ -20,7 +20,7 @@ export default {
     margin-bottom: 16px;
   `,
   Info: styled.p`
-    font-size: 16px;
+    font-size: 24px;
     font-weight: 500;
     color: #4a4a4a;
   `,
