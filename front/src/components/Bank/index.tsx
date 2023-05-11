@@ -1,17 +1,18 @@
-import React from "react";
-import { Address } from "viem";
-import "viem/window";
-import { FunctionSelector } from "./FunctionSelector";
-import selectors from "../../config/selectors";
+import CreateEmployee from "./FunctionSelector/CreateEmployee";
+import { Address, PublicClient, WalletClient } from "viem";
 import styles from "./styles";
+import React from "react";
+import "viem/window";
 
 const employees = Array(10).fill({ address: "0x0", budge: 10000, bonus: 300 });
 
 interface BankProp {
   account: Address;
+  publicClient: PublicClient;
+  walletClient: WalletClient;
 }
 
-function Bank({ account }: BankProp) {
+function Bank({ account, publicClient, walletClient }: BankProp) {
   // COMPONENT
   return (
     <>
@@ -39,24 +40,16 @@ function Bank({ account }: BankProp) {
           </styles.Column2>
         </div>
       </styles.Container>
-      <FunctionSelector
+      <CreateEmployee
         account={account}
-        selector={selectors.createEmployee}
-      ></FunctionSelector>
-      <FunctionSelector
-        account={account}
-        selector={selectors.updateEmployee}
-      ></FunctionSelector>
-      <FunctionSelector
-        account={account}
-        selector={selectors.deleteEmployee}
-      ></FunctionSelector>
-      <FunctionSelector
-        account={account}
-        selector={selectors.getEmployee}
-      ></FunctionSelector>
+        publicClient={publicClient}
+        walletClient={walletClient}
+      />
+      {/* <CreateEmployee />
+      <UpdateEmployee />
+      <DeleteEmployee />
+      <GetEmployee /> */}
     </>
   );
 }
-
 export default Bank;
