@@ -9,7 +9,7 @@ import {Token} from "./Token.sol";
  * @title Bank
  * @notice A contract to manage employee budgets using the Diamond Storage Library
  */
-contract PayAllEmployees {
+contract BankV2 {
     ERC20 token;
     /**
      * @dev Emitted when an employee is paid their budge
