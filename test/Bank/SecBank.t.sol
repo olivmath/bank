@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {DiamondStorageLib} from "../src/diamont/Lib.sol";
-import {Token} from "../src/facet/Token.sol";
-import {Bank} from "../src/facet/Bank.sol";
-import {BaseSetup} from "./BaseSetup.sol";
+import {DiamondStorageLib} from "../../src/diamond/Lib.sol";
+import {Token} from "../../src/facet/Token.sol";
+import {Bank} from "../../src/facet/Bank.sol";
+import {BaseSetup} from "../BaseSetup.sol";
 
 contract Attack {
     using DiamondStorageLib for DiamondStorageLib.Storage;
