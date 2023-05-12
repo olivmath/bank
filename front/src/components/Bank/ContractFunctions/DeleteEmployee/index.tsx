@@ -1,27 +1,11 @@
-import contracts from "../../../../config/contracts";
+import contracts, { WalletProps } from "../../../../config/contracts";
 import React, { useState, useEffect } from "react";
+import { Hash, TransactionReceipt } from "viem";
 import { TxDisplay } from "../../TxDisplay";
 import { foundry } from "viem/chains";
 import styles from "../styles";
-import {
-  Address,
-  Hash,
-  PublicClient,
-  TransactionReceipt,
-  WalletClient,
-} from "viem";
 
-interface CreateEmployeeProps {
-  account: Address;
-  publicClient: PublicClient;
-  walletClient: WalletClient;
-}
-
-export default function CreateEmployee({
-  account,
-  publicClient,
-  walletClient,
-}: CreateEmployeeProps) {
+export default function ({ account, publicClient, walletClient }: WalletProps) {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [receipt, setReceipt] = useState<TransactionReceipt | undefined>();
   const [employee, setEmployee] = useState<string>("");
