@@ -1,9 +1,10 @@
-import { Address, PublicClient, WalletClient, formatUnits } from "viem";
 import CreateEmployee from "./ContractFunctions/CreateEmployee";
 import UpdateEmployee from "./ContractFunctions/UpdateEmployee";
 import DeleteEmployee from "./ContractFunctions/DeleteEmployee";
+import contracts, { WalletProps } from "../../config/contracts";
+import PayEmployees from "./ContractFunctions/PayEmployees";
 import React, { useEffect, useState } from "react";
-import contracts from "../../config/contracts";
+import { formatUnits } from "viem";
 import styles from "./styles";
 import "viem/window";
 
@@ -13,17 +14,7 @@ interface Employee {
   bonus: number;
 }
 
-interface BankProps {
-  account: Address;
-  publicClient: PublicClient;
-  walletClient: WalletClient;
-}
-
-export default function Bank({
-  account,
-  publicClient,
-  walletClient,
-}: BankProps) {
+export default function ({ account, publicClient, walletClient }: WalletProps) {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [totalBonus, setTotalBonus] = useState<number>(0);
   const [totalCost, setTotalCost] = useState<number>(0);
@@ -106,6 +97,11 @@ export default function Bank({
         </styles.Container>
       </div>
       <div>
+        <PayEmployees
+          account={account}
+          publicClient={publicClient}
+          walletClient={walletClient}
+        />
         <CreateEmployee
           account={account}
           publicClient={publicClient}
