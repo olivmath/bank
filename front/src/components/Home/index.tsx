@@ -11,8 +11,7 @@ import {
   custom,
   http,
 } from "viem";
-
-const CONTROLLER = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+import contracts from "../../config/contracts";
 
 const publicClient = createPublicClient({
   chain: foundry,
@@ -25,7 +24,7 @@ const walletClient = createWalletClient({
 });
 
 export default function () {
-  const [account, setAccount] = useState<Address | null>(null);
+  const [account, setAccount] = useState<Address>();
 
   const connect = async () => {
     const [address] = await walletClient.requestAddresses();
@@ -35,14 +34,14 @@ export default function () {
   return (
     <div>
       {account ? (
-        account === CONTROLLER ? (
+        account === contracts.CONTROLLER ? (
           <Bank
             account={account}
             publicClient={publicClient}
             walletClient={walletClient}
           />
         ) : (
-          <Employee account={account} />
+          <Employee account={account} publicClient={publicClient} />
         )
       ) : (
         <styles.ConnectButton onClick={connect}>
