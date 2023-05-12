@@ -1,19 +1,16 @@
-import { Address, createPublicClient, formatUnits, http } from "viem";
+import { Address, PublicClient, formatUnits } from "viem";
 import React, { useEffect, useState } from "react";
 import contracts from "../../config/contracts";
-import { foundry } from "viem/chains";
 import Styles from "./styles";
 
-interface EmployeeProps {
+
+export default function ({
+  account,
+  publicClient,
+}: {
   account: Address;
-}
-
-const client = createPublicClient({
-  chain: foundry,
-  transport: http(),
-});
-
-function Employees({ account }: EmployeeProps) {
+  publicClient: PublicClient;
+}) {
   const [employeeData, setEmployeeData] = useState<{
     budge: string;
     bonus: string;
@@ -21,7 +18,7 @@ function Employees({ account }: EmployeeProps) {
 
   useEffect(() => {
     async function getEmployee() {
-      const data = await client.readContract({
+      const data = await publicClient.readContract({
         abi: contracts.facet_bank.abi,
         address: contracts.diamond.address,
         functionName: "getEmployee",
@@ -53,5 +50,3 @@ function Employees({ account }: EmployeeProps) {
     </div>
   );
 }
-
-export default Employees;
