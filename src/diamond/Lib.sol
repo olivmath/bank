@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
+error FunctionNotFound(bytes4 fnSelector);
+error IncorrectAction(uint8 action);
 library DiamondStorageLib {
     // Approximately 200 blocks per hour, 4800 blocks per day, and 144000 blocks per month
     uint256 constant LOCKTIME_IN_BLOCKS = 10;
