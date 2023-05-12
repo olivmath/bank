@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {DiamondStorageLib} from "../diamont/Lib.sol";
+import {DiamondStorageLib} from "../diamond/Lib.sol";
 import {ERC20} from "../facet/Token.sol";
 import {Token} from "./Token.sol";
 

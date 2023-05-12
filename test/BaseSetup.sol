@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {IDiamondCut} from "../src/diamont/interfaces/ICut.sol";
-import {Diamond} from "../src/diamont/Diamont.sol";
+import {IDiamondCut} from "../src/diamond/interfaces/ICut.sol";
+import {Diamond} from "../src/diamond/Diamond.sol";
 import {Bank} from "../src/facet/Bank.sol";
 import {Token} from "../src/facet/Token.sol";
 import {Test} from "forge-std/Test.sol";
@@ -49,7 +49,7 @@ contract BaseSetup is Test {
         diamond = new Diamond(address(token));
 
         // ----------------
-        // BANK CONTRACT
+        // BANK CONTRACT FACET
         // ----------------
         // 0x520a19c0  =>  createEmployee(address,uint256)
         // 0x5e91d8ec  =>  updateEmployee(address,uint256)

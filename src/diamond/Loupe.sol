@@ -8,19 +8,13 @@ import {DiamondStorageLib} from "./Lib.sol";
 contract DiamondLoupe is IDiamondLoupe {
     using DiamondStorageLib for DiamondStorageLib.Storage;
 
-    function facetAddress(
-        bytes4 fnSelector
-    ) external view override returns (address facetAddress_) {
-        DiamondStorageLib.Storage storage ds = DiamondStorageLib
-            .getDiamondStorage();
+    function facetAddress(bytes4 fnSelector) external view override returns (address facetAddress_) {
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
         facetAddress_ = ds.fnSelectorToFacet[fnSelector];
     }
 
-    function facetFunctionSelectors(
-        address facet_
-    ) external view override returns (bytes4[] memory fnSelectors) {
-        DiamondStorageLib.Storage storage ds = DiamondStorageLib
-            .getDiamondStorage();
+    function facetFunctionSelectors(address facet_) external view override returns (bytes4[] memory fnSelectors) {
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
         fnSelectors = new bytes4[](ds.fnSelectorLength);
         uint256 index = 0;
         //
@@ -38,14 +32,8 @@ contract DiamondLoupe is IDiamondLoupe {
         }
     }
 
-    function facetAddresses()
-        public
-        view
-        override
-        returns (address[] memory facetAddresses_)
-    {
-        DiamondStorageLib.Storage storage ds = DiamondStorageLib
-            .getDiamondStorage();
+    function facetAddresses() public view override returns (address[] memory facetAddresses_) {
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
         address[] memory uniqueFacetAddresses = new address[](
             ds.fnSelectorLength
         );
@@ -76,8 +64,7 @@ contract DiamondLoupe is IDiamondLoupe {
     }
 
     function facets() external view override returns (Facet[] memory facets_) {
-        DiamondStorageLib.Storage storage ds = DiamondStorageLib
-            .getDiamondStorage();
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
         address[] memory uniqueFacetAddresses = facetAddresses();
         facets_ = new Facet[](uniqueFacetAddresses.length);
         //
@@ -87,10 +74,7 @@ contract DiamondLoupe is IDiamondLoupe {
             //
             uint256 selectorCount = 0;
             for (uint256 j = 0; j < ds.fnSelectorLength; j++) {
-                if (
-                    ds.fnSelectorToFacet[ds.allFnSelectors[j]] ==
-                    uniqueFacetAddresses[i]
-                ) {
+                if (ds.fnSelectorToFacet[ds.allFnSelectors[j]] == uniqueFacetAddresses[i]) {
                     selectorCount += 1;
                 }
             }
@@ -99,10 +83,7 @@ contract DiamondLoupe is IDiamondLoupe {
             bytes4[] memory fnSelectors = new bytes4[](selectorCount);
             uint256 index = 0;
             for (uint256 j = 0; j < ds.fnSelectorLength; j++) {
-                if (
-                    ds.fnSelectorToFacet[ds.allFnSelectors[j]] ==
-                    uniqueFacetAddresses[i]
-                ) {
+                if (ds.fnSelectorToFacet[ds.allFnSelectors[j]] == uniqueFacetAddresses[i]) {
                     fnSelectors[index] = ds.allFnSelectors[j];
                     index += 1;
                 }

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {IDiamondCut} from "../src/diamont/interfaces/ICut.sol";
+import {IDiamondCut} from "../src/diamond/interfaces/ICut.sol";
 import "../lib/forge-std/src/Script.sol";
-import {Diamond} from "../src/diamont/Diamont.sol";
+import {Diamond} from "../src/diamond/diamond.sol";
 import {Token} from "../src/facet/Token.sol";
 import {Bank} from "../src/facet/Bank.sol";
 

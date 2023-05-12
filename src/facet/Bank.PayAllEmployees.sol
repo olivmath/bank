@@ -37,8 +37,7 @@ contract PayAllEmployees {
      * @notice Modifier to restrict function access to controller only
      */
     function onlyController() internal view {
-        DiamondStorageLib.Storage storage ds = DiamondStorageLib
-            .getDiamondStorage();
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
 
         require(ds.controller == msg.sender, "NOT_AUTHORIZED");
     }
@@ -52,8 +51,7 @@ contract PayAllEmployees {
      */
     function payAllEmployees() external {
         onlyController();
-        DiamondStorageLib.Storage storage ds = DiamondStorageLib
-            .getDiamondStorage();
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
         token = Token(ds.token);
         DiamondStorageLib.Employee memory emp;
         uint256 contractBalance = token.balanceOf(address(this));
@@ -66,9 +64,7 @@ contract PayAllEmployees {
             if (emp.locktime > block.number) {
                 continue;
             } else if (total <= contractBalance) {
-                ds.employees[emp.employee].locktime =
-                    block.number +
-                    DiamondStorageLib.LOCKTIME_IN_BLOCKS;
+                ds.employees[emp.employee].locktime = block.number + DiamondStorageLib.LOCKTIME_IN_BLOCKS;
                 ds.employees[emp.employee].bonus = 0;
                 contractBalance -= total;
 
@@ -98,8 +94,7 @@ contract PayAllEmployees {
      * @return pay The total number of payments made
      */
     function getTotalPayments() external view returns (uint256 pay) {
-        DiamondStorageLib.Storage storage ds = DiamondStorageLib
-            .getDiamondStorage();
+        DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
 
         pay = ds.paymentsCounter;
     }
