@@ -124,7 +124,7 @@ abstract contract ERC20 {
 }
 
 contract Token is ERC20 {
-    constructor() ERC20("Token", "TKN", 8) {
+    constructor() ERC20("Token", "TKN", 18) {
         uint256 ONE_BILLION = 1_000_000_000 * 10e18;
         _mint(msg.sender, ONE_BILLION);
     }
