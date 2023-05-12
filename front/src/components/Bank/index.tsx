@@ -19,6 +19,7 @@ export default function ({ account, publicClient, walletClient }: WalletProps) {
   const [totalBonus, setTotalBonus] = useState<number>(0);
   const [totalCost, setTotalCost] = useState<number>(0);
   const [balance, setBalance] = useState<number>(0);
+  const [payed, setPayed] = useState<number>(0);
 
   useEffect(() => {
     async function getAllEmployees() {
@@ -64,8 +65,18 @@ export default function ({ account, publicClient, walletClient }: WalletProps) {
       setBalance(Number(formatUnits(data, 18)));
     }
 
+    async function totalPayed() {
+      const data = await publicClient.readContract({
+        abi: contracts.facet_bank_v2.abi,
+        address: contracts.diamond.address,
+        functionName: "getTotalPayments",
+      });
+      setPayed(Number(data));
+    }
+
     getAllEmployees();
     getBalance();
+    totalPayed();
   }, []);
 
   return (
@@ -81,6 +92,7 @@ export default function ({ account, publicClient, walletClient }: WalletProps) {
               <p>Balance: {balance}</p>
               <p>Total Employees: {employees.length}</p>
               <p>Total Bonus: {totalBonus}</p>
+              <p>Total Payeds: {payed}</p>
             </styles.Column1>
           </div>
           <div>

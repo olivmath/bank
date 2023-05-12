@@ -4,6 +4,7 @@ const DIAMOND_ADDRESS: Address = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 const TOKEN_ADDRESS: Address = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
 const BANK_ADDRESS: Address = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";
 const CONTROLLER: Address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+const BANK_V2_ADDRESS: Address = "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707";
 
 export interface WalletProps {
   account: Address;
@@ -182,6 +183,75 @@ const facet_bank = {
     },
   ],
   address: BANK_ADDRESS,
+};
+
+const facet_bank_v2 = {
+  abi: [
+    {
+      inputs: [],
+      stateMutability: "nonpayable",
+      type: "constructor",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
+          name: "employee",
+          type: "address",
+        },
+        {
+          indexed: false,
+          internalType: "uint256",
+          name: "bonus",
+          type: "uint256",
+        },
+      ],
+      name: "Bonus",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
+          name: "employee",
+          type: "address",
+        },
+        {
+          indexed: false,
+          internalType: "uint256",
+          name: "budge",
+          type: "uint256",
+        },
+      ],
+      name: "Paid",
+      type: "event",
+    },
+    {
+      inputs: [],
+      name: "getTotalPayments",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "pay",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "payAllEmployees",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+  ],
+  address: BANK_V2_ADDRESS,
 };
 
 const diamond = {
@@ -597,6 +667,7 @@ const token = {
 export default {
   token,
   facet_bank,
+  facet_bank_v2,
   diamond,
   CONTROLLER,
 };
