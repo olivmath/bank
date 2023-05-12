@@ -1,8 +1,15 @@
-import { Address } from "viem";
+import { Address, PublicClient, WalletClient } from "viem";
 
-const BANK_ADDRESS: Address = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";
 const DIAMOND_ADDRESS: Address = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 const TOKEN_ADDRESS: Address = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+const BANK_ADDRESS: Address = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";
+const CONTROLLER: Address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+
+export interface WalletProps {
+  account: Address;
+  publicClient: PublicClient;
+  walletClient: WalletClient;
+}
 
 const facet_bank = {
   abi: [
@@ -591,4 +598,5 @@ export default {
   token,
   facet_bank,
   diamond,
+  CONTROLLER,
 };
