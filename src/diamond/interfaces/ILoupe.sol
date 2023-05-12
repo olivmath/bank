@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import "./Facet.sol";
+import "./Facet.types.sol";
 
 interface IDiamondLoupe {
     function facets() external view returns (Facet[] memory facets_);

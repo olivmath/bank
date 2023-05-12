@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
+import {Facet, Action} from "../src/diamond/interfaces/Facet.types.sol";
 import {IDiamondCut} from "../src/diamond/interfaces/ICut.sol";
 import {Diamond} from "../src/diamond/Diamond.sol";
 import {Bank} from "../src/facet/Bank.sol";
@@ -21,7 +22,7 @@ contract BaseSetup is Test {
     Bank bank;
     Token token;
     Diamond diamond;
-    IDiamondCut.FacetCut[] public diamondCut;
+    Facet[] diamondCut;
 
     function setUp() public virtual {
         controller = address(0xffff);
@@ -71,13 +72,8 @@ contract BaseSetup is Test {
         vm.prank(controller);
         bank = new Bank();
 
-        IDiamondCut.FacetCut memory bankFaucet = IDiamondCut.FacetCut({
-            facetAddress: address(bank),
-            action: IDiamondCut.Action.Save,
-            functionSelectors: selectors
-        });
-
-        diamondCut.push(bankFaucet);
+        Facet memory bankFacet = Facet({facetAddress: address(bank), action: Action.Save, fnSelectors: selectors});
+        diamondCut.push(bankFacet);
 
         vm.prank(controller);
         diamond.diamondCut(diamondCut, address(0), new bytes(0));
