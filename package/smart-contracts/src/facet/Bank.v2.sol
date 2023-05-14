@@ -5,6 +5,8 @@ import {DiamondStorageLib} from "../diamond/Lib.sol";
 import {ERC20} from "../facet/Token.sol";
 import {Token} from "./Token.sol";
 
+error NothingToPay();
+
 /**
  * @title Bank
  * @notice A contract to manage employee budgets using the Diamond Storage Library
@@ -49,12 +51,14 @@ contract BankV2 {
      * @dev If there's not enough balance, the remaining balance is transferred, and the rest is added to the employee's bonus
      * @dev If there's no contract balance, the entire budget is added to the employee's bonus
      */
-    function payAllEmployees() external {
+    function payAllEmployees() public {
         onlyController();
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
         token = Token(ds.token);
         DiamondStorageLib.Employee memory emp;
         uint256 contractBalance = token.balanceOf(address(this));
+
+        bool payed = false;
 
         for (uint256 i = 0; i < ds.employeeList.length; i++) {
             address employee = ds.employeeList[i];
@@ -69,23 +73,25 @@ contract BankV2 {
                 contractBalance -= total;
 
                 token.transfer(emp.employee, total);
-
-                ds.paymentsCounter++;
                 emit Paid(emp.employee, total);
+                payed = true;
             } else {
                 uint256 bonus = emp.budge - contractBalance;
                 ds.employees[emp.employee].bonus += bonus;
 
                 if (contractBalance > 0) {
                     token.transfer(emp.employee, contractBalance);
-
-                    ds.paymentsCounter++;
                     emit Paid(emp.employee, contractBalance);
 
                     contractBalance = 0;
+                    payed = true;
                 }
                 emit Bonus(emp.employee, bonus);
             }
+        }
+
+        if (payed == false) {
+            revert NothingToPay();
         }
     }
 
@@ -93,6 +99,7 @@ contract BankV2 {
      * @dev Returns the total number of payments made
      * @return pay The total number of payments made
      */
+
     function getTotalPayments() external view returns (uint256 pay) {
         DiamondStorageLib.Storage storage ds = DiamondStorageLib.getDiamondStorage();
 

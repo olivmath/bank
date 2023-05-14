@@ -2,12 +2,11 @@
 pragma solidity ^0.8.18;
 
 import {Facet, Action} from "../../src/diamond/interfaces/Facet.types.sol";
+import {BankV2, NothingToPay} from "../../src/facet/Bank.v2.sol";
 import {FunctionNotFound} from "../../src/diamond/Lib.sol";
-import {BankV2} from "../../src/facet/Bank.v2.sol";
 import {BankV3} from "../../src/facet/Bank.v3.sol";
 import {Bank} from "../../src/facet/Bank.sol";
 import {BaseSetup} from "../BaseSetup.sol";
-
 
 contract CutTest is BaseSetup {
     BankV2 bankv2;
@@ -57,6 +56,13 @@ contract CutTest is BaseSetup {
 
         Facet[] memory facets = diamond.facets();
         assertEq(facets.length, 2, "Should have 2 Facets");
+
+        vm.prank(controller);
+        (bool ok, bytes memory data) = address(diamond).call(abi.encodeWithSelector(BankV2.payAllEmployees.selector));
+        bytes memory expectedRevertData = abi.encodeWithSelector(NothingToPay.selector);
+
+        assertEq(ok, false, "Should revert function BankV2.payAllEmployees when nothing to pay");
+        assertEq(data, expectedRevertData, "Returned data did not match expected revert data");
     }
 
     function testModifyFacetToV3() public {
