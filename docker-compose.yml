@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  frontend:
+    build:
+      context: ./package/front-end
+      dockerfile: Dockerfile
+    ports:
+      - 5173:5173
+
+  anvil:
+    build:
+      context: ./package/smart-contracts
+      dockerfile: Dockerfile.anvil
+    ports:
+      - 8545:8545
+
+  deploy:
+    depends_on:
+      - anvil
+    build:
+      context: ./package/smart-contracts
+      dockerfile: Dockerfile.deploy
+
+  oracle:
+    build:
+      context: ./package/back-end
+      dockerfile: Dockerfile
