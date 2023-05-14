@@ -1,0 +1,15 @@
+{
+    "name": "bank-back-end",
+    "private": true,
+    "version": "0.1.0",
+    "type": "module",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/index.js"
+    },
+    "dependencies": {
+        "node-fetch": "^3.3.1",
+        "viem": "^0.3.24"
+    }
+}
