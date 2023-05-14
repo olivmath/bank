@@ -10,22 +10,21 @@ async function payAllEmployees() {
         functionName: "payAllEmployees",
         chain: foundry,
     };
+    const eventDetails = {
+        address: contracts.facet_bank_v2.address,
+        event: contracts.facet_bank_v2.abi[2],
+        onLogs: logs => console.log(logs)
+    }
 
+    const unwatch = setup.publicClient.watchEvent(eventDetails)
     const hash = await setup.walletClient.writeContract(contractDetails);
     const receipt = await setup.publicClient.waitForTransactionReceipt({ hash });
-    const unwatch = setup.publicClient.watchContractEvent({
-        address: contracts.facet_bank_v2.address,
-        abi: contracts.facet_bank_v2.abi,
-        onLogs: logs => console.log(logs)
-    })
 
 
     if (receipt.status === 'success') {
         console.log("✅ Payed with success");
-        console.log(unwatch())
     } else {
         console.log("🚨 Payed reverted");
-        console.log(unwatch())
     }
 }
 
