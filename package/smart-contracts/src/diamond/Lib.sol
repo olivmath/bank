@@ -1,16 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {Facet, Action} from "./interfaces/Facet.types.sol";
-
-error InitializationFunctionReverted(address _initializationContractAddress, bytes _calldata);
-error CannotAddFunctionToDiamondThatAlreadyExists(bytes4 _selector);
-error FacetZeroAddress(address facetAddress, string debugMessage);
-error NoBytecodeAtAddress(address _contract, string debugMessage);
-error CannotRemoveImmutableFunction(address facetAddress);
-error FunctionNotFound(bytes4 fnSelector);
-error IncorrectAction(uint8 action);
-error FnSelectorsEmpty();
+import {Facet, Action} from "./interfaces/Types.sol";
+import {
+    InitializationFunctionReverted,
+    CannotAddFunctionToDiamondThatAlreadyExists,
+    FacetZeroAddress,
+    NoBytecodeAtAddress,
+    CannotRemoveImmutableFunction,
+    FunctionNotFound,
+    IncorrectAction,
+    FnSelectorsEmpty
+} from "./interfaces/Types.sol";
 
 library DiamondStorageLib {
     ////////////////////////////////////////////////////////////////
