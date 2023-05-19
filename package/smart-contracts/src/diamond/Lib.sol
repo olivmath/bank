@@ -113,7 +113,7 @@ library DiamondStorageLib {
             } else if (action == Action.Modify) {
                 replaceFunctions(_diamondCut[facetIndex].facetAddress, _diamondCut[facetIndex].fnSelectors);
             } else if (action == Action.Remove) {
-                // removeFunctions(_diamondCut[facetIndex].facetAddress, _diamondCut[facetIndex].fnSelectors);
+                removeFunctions(_diamondCut[facetIndex].facetAddress, _diamondCut[facetIndex].fnSelectors);
             } else {
                 revert IncorrectAction(uint8(action));
             }
