@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import "./Lib.sol";
-import "./interfaces/ICut.sol";
+import {Facet} from "./interfaces/Types.sol";
+import {ICutter} from "./interfaces/ICutter.sol";
+import {DiamondStorageLib} from "./Lib.sol";
 
-contract DiamondCut is IDiamondCut {
+contract Cutter is ICutter {
     using DiamondStorageLib for DiamondStorageLib.Storage;
 
     /// @notice Add/replace/remove any number of functions and optionally execute a function with delegatecall

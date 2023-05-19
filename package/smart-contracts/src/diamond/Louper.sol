@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {IDiamondLoupe} from "./interfaces/ILoupe.sol";
-import {Facet} from "./interfaces/Facet.types.sol";
+import {ILouper} from "./interfaces/ILouper.sol";
+import {Facet} from "./interfaces/Types.sol";
 import {DiamondStorageLib} from "./Lib.sol";
 
-contract DiamondLoupe is IDiamondLoupe {
+contract Louper is ILouper {
     using DiamondStorageLib for DiamondStorageLib.Storage;
 
     function facetAddress(bytes4 fnSelector) external view override returns (address facetAddress_) {
