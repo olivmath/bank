@@ -26,6 +26,10 @@ library DiamondStorageLib {
     // Approximately 200 blocks per hour, 4800 blocks per day, and 144000 blocks per month
     uint256 constant LOCKTIME_IN_BLOCKS = 144000;
 
+    /*////////////////////////////////////////////////////////////
+                                                           STRUCTS
+    ////////////////////////////////////////////////////////////*/
+
     /// @dev Employee structure to hold employee details
     struct Employee {
         address employee;
@@ -66,6 +70,10 @@ library DiamondStorageLib {
         uint256 facetsLength;
     }
 
+    /*////////////////////////////////////////////////////////////
+                                                    GET FUNCTIONS
+    ////////////////////////////////////////////////////////////*/
+
     /// @notice This function retrieves the diamond storage struct which is declared in a specific storage slot.
     /// @dev The diamond storage struct is stored at a specific storage slot to prevent clashes with other state variables in the contract.
     /// @return ds Returns an instance of the Storage struct (representing the diamond storage).
@@ -76,79 +84,23 @@ library DiamondStorageLib {
         }
     }
 
-    /// @notice This function is used to set a new controller in the diamond storage.
-    /// @dev This function first retrieves the diamond storage struct and then updates the controller property.
-    /// @param newController The address of the new controller.
-    function setController(address newController) internal {
-        Storage storage ds = getDiamondStorage();
-        ds.controller = newController;
-    }
-
     /// @notice This function is used to get the controller address from the diamond storage.
     /// @dev This function retrieves the diamond storage struct and returns the controller property.
     /// @return The address of the controller.
-    function controller() internal view returns (address) {
+    function getController() internal view returns (address) {
         return getDiamondStorage().controller;
-    }
-
-    /// @notice This function is used to set the token address in the diamond storage.
-    /// @dev It retrieves the diamond storage struct and sets the token property to the address provided as a parameter.
-    /// @param newToken The address of the new token to be set in the diamond storage.
-    function setToken(address newToken) public {
-        Storage storage ds = getDiamondStorage();
-        ds.token = newToken;
     }
 
     /// @notice This function retrieves the token address from the diamond storage.
     /// @dev It retrieves the diamond storage struct and returns the token property.
     /// @return The address of the token stored in the diamond storage.
-    function token() internal view returns (address) {
+    function getToken() internal view returns (address) {
         return getDiamondStorage().token;
     }
 
-    /// @notice This function verifies if the caller is the current controller of the contract.
-    /// @dev It retrieves the controller address from the diamond storage and compares it with the caller's address (msg.sender).
-    /// @dev If the addresses are not the same, it reverts the transaction with the NotAuthorized error.
-    /// @custom:require The function requires that the caller's address is the same as the controller's address.
-    function onlyController() internal view {
-        Storage storage ds = getDiamondStorage();
-        if (ds.controller != msg.sender) {
-            revert NoAuthorized();
-        }
-    }
-
-    /// @dev Performs a diamond cut, which adds, replaces or removes one or more functions.
-    /// @param _diamondCut Contains data about the function(s) being added, replaced or removed.
-    /// @param _init The address of an initialization contract that initializes state variables. This is can be address(0) which means no initialization.
-    /// @param _calldata A function call, including function selector and arguments, that is executed with delegatecall.
-    function diamondCut(Facet[] memory _diamondCut, address _init, bytes memory _calldata) internal {
-        // iterate over all facets
-        for (uint256 facetIndex; facetIndex < _diamondCut.length; facetIndex++) {
-            Action action = _diamondCut[facetIndex].action;
-
-            if (action == Action.Save) {
-                addFunctions(_diamondCut[facetIndex].facetAddress, _diamondCut[facetIndex].fnSelectors);
-            } else if (action == Action.Modify) {
-                replaceFunctions(_diamondCut[facetIndex].facetAddress, _diamondCut[facetIndex].fnSelectors);
-            } else if (action == Action.Remove) {
-                removeFunctions(_diamondCut[facetIndex].facetAddress, _diamondCut[facetIndex].fnSelectors);
-            } else {
-                revert IncorrectAction(uint8(action));
-            }
-        }
-        emit DiamondCut(_diamondCut, _init, _calldata);
-        initializeDiamondCut(_init, _calldata);
-    }
-
-    function enforceHasContractCode(address _contract, string memory debugMessage) internal view {
-        uint256 contractSize;
-        assembly {
-            contractSize := extcodesize(_contract)
-        }
-        if (contractSize == 0) {
-            revert NoBytecodeAtAddress(_contract, debugMessage);
-        }
-    }
+    /*////////////////////////////////////////////////////////////
+                                                    SET FUNCTIONS
+    ////////////////////////////////////////////////////////////*/
 
     function initializeDiamondCut(address _init, bytes memory _calldata) internal {
         if (_init == ZERO_ADDRESS) {
@@ -173,6 +125,70 @@ library DiamondStorageLib {
                 revert InitializationFunctionReverted(_init, _calldata);
             }
         }
+    }
+
+    /// @notice This function is used to set a new controller in the diamond storage.
+    /// @dev This function first retrieves the diamond storage struct and then updates the controller property.
+    /// @param newController The address of the new controller.
+    function setController(address newController) internal {
+        Storage storage ds = getDiamondStorage();
+        ds.controller = newController;
+    }
+
+    /// @notice This function is used to set the token address in the diamond storage.
+    /// @dev It retrieves the diamond storage struct and sets the token property to the address provided as a parameter.
+    /// @param newToken The address of the new token to be set in the diamond storage.
+    function setToken(address newToken) public {
+        Storage storage ds = getDiamondStorage();
+        ds.token = newToken;
+    }
+
+    /*////////////////////////////////////////////////////////////
+                                              VALIDATION FUNCTIONS
+    ////////////////////////////////////////////////////////////*/
+
+    /// @notice This function verifies if the caller is the current controller of the contract.
+    /// @dev It retrieves the controller address from the diamond storage and compares it with the caller's address (msg.sender).
+    /// @dev If the addresses are not the same, it reverts the transaction with the NotAuthorized error.
+    /// @custom:require The function requires that the caller's address is the same as the controller's address.
+    function onlyController() internal view {
+        Storage storage ds = getDiamondStorage();
+        if (ds.controller != msg.sender) {
+            revert NoAuthorized();
+        }
+    }
+
+    function enforceHasContractCode(address _contract, string memory debugMessage) internal view {
+        uint256 contractSize;
+        assembly {
+            contractSize := extcodesize(_contract)
+        }
+        if (contractSize == 0) {
+            revert NoBytecodeAtAddress(_contract, debugMessage);
+        }
+    }
+
+    /*////////////////////////////////////////////////////////////
+                                                     CUT FUCNTIONS
+    ////////////////////////////////////////////////////////////*/
+
+    function diamondCut(Facet[] memory _diamondCut, address _init, bytes memory _calldata) internal {
+        // iterate over all facets
+        for (uint256 facetIndex; facetIndex < _diamondCut.length; facetIndex++) {
+            Action action = _diamondCut[facetIndex].action;
+
+            if (action == Action.Save) {
+                addFunctions(_diamondCut[facetIndex].facetAddress, _diamondCut[facetIndex].fnSelectors);
+            } else if (action == Action.Modify) {
+                replaceFunctions(_diamondCut[facetIndex].facetAddress, _diamondCut[facetIndex].fnSelectors);
+            } else if (action == Action.Remove) {
+                removeFunctions(_diamondCut[facetIndex].facetAddress, _diamondCut[facetIndex].fnSelectors);
+            } else {
+                revert IncorrectAction(uint8(action));
+            }
+        }
+        emit DiamondCut(_diamondCut, _init, _calldata);
+        initializeDiamondCut(_init, _calldata);
     }
 
     /*////////////////////////////////////////////////////////////
