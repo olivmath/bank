@@ -104,8 +104,6 @@ library DiamondStorageLib {
     //////////////// DIAMOND CUT
     ////////////////////////////////////////////////////////////////
 
-    event log_string(string msg);
-
     function diamondCut(Facet[] memory _diamondCut, address _init, bytes memory _calldata) internal {
         for (uint256 facetIndex; facetIndex < _diamondCut.length; facetIndex++) {
             Action action = _diamondCut[facetIndex].action;
