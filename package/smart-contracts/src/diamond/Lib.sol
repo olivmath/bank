@@ -172,6 +172,16 @@ library DiamondStorageLib {
                                                      CUT FUCNTIONS
     ////////////////////////////////////////////////////////////*/
 
+
+    /// @dev This function applies a diamond cut, which is a set of changes to a diamond's facets.
+    /// @param _diamondCut An array of facet objects, each containing a facet address, an action (Save, Modify, or Remove), and a list of function selectors.
+    /// @param _init The address to use for initialization. If zero, no initialization is performed.
+    /// @param _calldata The calldata to use for initialization.
+    /// This function emits the `DiamondCut` event.
+    /// After the cut has been applied, the diamond is initialized using the `_init` address and `_calldata`.
+    /// If the `_init` address is zero, no initialization is performed.
+    /// Errors:
+    /// - Revert an `IncorrectAction` error if an unknown action type is encountered.
     function diamondCut(Facet[] memory _diamondCut, address _init, bytes memory _calldata) internal {
         // iterate over all facets
         for (uint256 facetIndex; facetIndex < _diamondCut.length; facetIndex++) {
