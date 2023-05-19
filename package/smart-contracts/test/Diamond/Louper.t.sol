@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {Facet} from "../../src/diamond/interfaces/Facet.types.sol";
+import {Facet} from "../../src/diamond/interfaces/Types.sol";
 import {BaseSetup} from "../BaseSetup.sol";
 
 contract LouperTest is BaseSetup {

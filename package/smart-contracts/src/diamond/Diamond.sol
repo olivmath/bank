@@ -2,10 +2,10 @@
 pragma solidity ^0.8.18;
 
 import {FunctionNotFound, DiamondStorageLib} from "./Lib.sol";
-import "./Loupe.sol";
-import "./Cut.sol";
+import {Louper} from "./Louper.sol";
+import {Cutter} from "./Cutter.sol";
 
-contract Diamond is DiamondCut, DiamondLoupe {
+contract Diamond is Cutter, Louper {
     constructor(address token) {
         DiamondStorageLib.setController(msg.sender);
         DiamondStorageLib.setToken(token);

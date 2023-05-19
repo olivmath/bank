@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {Facet, Action} from "../../src/diamond/interfaces/Facet.types.sol";
+import {Facet, Action} from "../../src/diamond/interfaces/Types.sol";
 import {BankV2, NothingToPay} from "../../src/facet/Bank.v2.sol";
 import {FunctionNotFound} from "../../src/diamond/Lib.sol";
 import {BankV3} from "../../src/facet/Bank.v3.sol";
