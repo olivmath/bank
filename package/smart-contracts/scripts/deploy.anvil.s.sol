@@ -2,19 +2,22 @@
 pragma solidity ^0.8.18;
 
 import {Facet, Action} from "../src/diamond/interfaces/Types.sol";
-import {Diamond} from "../src/diamond/diamond.sol";
+import {FrontErrors} from "../src/facet/FrontErrors.sol";
+import {Diamond} from "../src/diamond/Diamond.sol";
+import {BankV2} from "../src/facet/Bank.v2.sol";
 import {Token} from "../src/facet/Token.sol";
 import {Bank} from "../src/facet/Bank.sol";
-import {BankV2} from "../src/facet/Bank.v2.sol";
 import "../lib/forge-std/src/Script.sol";
 
 contract DeployAnvil is Script {
-    Bank bankv1;
+    FrontErrors front;
     BankV2 bankv2;
+    Bank bankv1;
     Token token;
     Diamond diamond;
     Facet[] diamondCutV1;
     Facet[] diamondCutV2;
+    Facet[] diamondCutV3;
 
     function run() external {
         vm.startBroadcast(
@@ -89,6 +92,33 @@ contract DeployAnvil is Script {
         diamondCutV2.push(bankV2FacetModity);
 
         diamond.diamondCut(diamondCutV2, address(0), new bytes(0));
+
+
+        // ----------------
+        // FRONT ERRORS CONTRACT FACET
+        // ----------------
+        // 0xaa78da13  =>  withMultipleArgs()
+        // 0xf259030d  =>  withStringArgs()
+        // 0x15218ec1  =>  withBoolArgs()
+        // 0xc9294df0  =>  withUintArgs()
+        // 0xa74d06f9  =>  withoutArgs()
+        // 0xff9aea68  =>  requireString()  
+
+        bytes4[] memory selectorsFront = new bytes4[](6);
+        selectorsFront[0] = FrontErrors.withMultipleArgs.selector;
+        selectorsFront[1] = FrontErrors.withStringArgs.selector;
+        selectorsFront[2] = FrontErrors.withBoolArgs.selector;
+        selectorsFront[3] = FrontErrors.withUintArgs.selector;
+        selectorsFront[4] = FrontErrors.withoutArgs.selector;
+        selectorsFront[5] = FrontErrors.requireString.selector;
+
+        front = new FrontErrors();
+        console.log("FrontErrors", address(front));
+
+        Facet memory frontFacet = Facet({facetAddress: address(front), action: Action.Save, fnSelectors: selectorsFront});
+        diamondCutV3.push(frontFacet);
+
+        diamond.diamondCut(diamondCutV3, address(0), new bytes(0));
 
         vm.stopBroadcast();
     }
