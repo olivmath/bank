@@ -733,13 +733,6 @@ const facet_errors = {
     },
     {
       inputs: [],
-      name: "requireString",
-      outputs: [],
-      stateMutability: "pure",
-      type: "function",
-    },
-    {
-      inputs: [],
       name: "withBoolArgs",
       outputs: [],
       stateMutability: "pure",
@@ -748,6 +741,13 @@ const facet_errors = {
     {
       inputs: [],
       name: "withMultipleArgs",
+      outputs: [],
+      stateMutability: "pure",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "withRequire",
       outputs: [],
       stateMutability: "pure",
       type: "function",
