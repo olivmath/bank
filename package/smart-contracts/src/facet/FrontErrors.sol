@@ -27,7 +27,7 @@ contract FrontErrors {
     function withoutArgs() external pure {
         revert WithoutArgs();
     }
-    function requireString() external pure {
+    function withRequire() external pure {
         require(false, "Erro by require");
     }
 }

@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 import { formatUnits } from "viem";
 import styles from "./styles";
 import "viem/window";
+import Errors from "./ContractFunctions/Errors";
 
 interface Employee {
   addr: string;
@@ -125,6 +126,11 @@ export default function ({ account, publicClient, walletClient }: WalletProps) {
           walletClient={walletClient}
         />
         <DeleteEmployee
+          account={account}
+          publicClient={publicClient}
+          walletClient={walletClient}
+        />
+        <Errors
           account={account}
           publicClient={publicClient}
           walletClient={walletClient}

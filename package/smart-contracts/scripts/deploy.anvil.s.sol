@@ -102,7 +102,7 @@ contract DeployAnvil is Script {
         // 0x15218ec1  =>  withBoolArgs()
         // 0xc9294df0  =>  withUintArgs()
         // 0xa74d06f9  =>  withoutArgs()
-        // 0xff9aea68  =>  requireString()  
+        // 0xff9aea68  =>  withRequire()  
 
         bytes4[] memory selectorsFront = new bytes4[](6);
         selectorsFront[0] = FrontErrors.withMultipleArgs.selector;
@@ -110,7 +110,7 @@ contract DeployAnvil is Script {
         selectorsFront[2] = FrontErrors.withBoolArgs.selector;
         selectorsFront[3] = FrontErrors.withUintArgs.selector;
         selectorsFront[4] = FrontErrors.withoutArgs.selector;
-        selectorsFront[5] = FrontErrors.requireString.selector;
+        selectorsFront[5] = FrontErrors.withRequire.selector;
 
         front = new FrontErrors();
         console.log("FrontErrors", address(front));
