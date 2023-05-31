@@ -172,18 +172,15 @@ library DiamondStorageLib {
                                                      CUT FUCNTIONS
     ////////////////////////////////////////////////////////////*/
 
-
-    /// @dev This function applies a diamond cut, which is a set of changes to a diamond's facets.
+    /// @notice This function applies a diamond cut, which is a set of changes to a diamond's facets.
     /// @param _diamondCut An array of facet objects, each containing a facet address, an action (Save, Modify, or Remove), and a list of function selectors.
     /// @param _init The address to use for initialization. If zero, no initialization is performed.
     /// @param _calldata The calldata to use for initialization.
-    /// This function emits the `DiamondCut` event.
-    /// After the cut has been applied, the diamond is initialized using the `_init` address and `_calldata`.
-    /// If the `_init` address is zero, no initialization is performed.
-    /// Errors:
-    /// - Revert an `IncorrectAction` error if an unknown action type is encountered.
+    /// @dev This function emits the `DiamondCut` event.
+    /// @dev After the cut has been applied, the diamond is initialized using the `_init` address and `_calldata`.
+    /// @dev If the `_init` address is zero, no initialization is performed.
+    /// @dev Revert an `IncorrectAction` error if an unknown action type is encountered.
     function diamondCut(Facet[] memory _diamondCut, address _init, bytes memory _calldata) internal {
-        // iterate over all facets
         for (uint256 facetIndex; facetIndex < _diamondCut.length; facetIndex++) {
             Action action = _diamondCut[facetIndex].action;
 
@@ -206,29 +203,21 @@ library DiamondStorageLib {
     ////////////////////////////////////////////////////////////*/
 
     /// @notice This function is responsible for adding new function selectors to a facet.
-    /// @dev It checks if the provided function selectors are valid, if the facet address is not zero and if the facet does not already contain the function selectors.
+    /// @dev It checks:
+    /// @dev if the provided function selectors array are not empty.
+    /// @dev if the facet address is not zero
+    /// @dev if the facet does not already contain the function selectors.
     /// @dev If these conditions are met, the function selectors are added to the facet.
     /// @param _facetAddress The address of the facet to which the function selectors will be added.
     /// @param _fnSelectors An array of function selectors that will be added to the facet.
-    /// @custom:require _fnSelectors array must not be empty.
-    /// @custom:require _facetAddress must not be a zero address.
-    /// @custom:require The function selectors must not already exist in the facet.
     function addFunctions(address _facetAddress, bytes4[] memory _fnSelectors) internal {
-        // error handling
-        if (_fnSelectors.length <= 0) {
-            revert FnSelectorsEmpty();
-        } else if (_facetAddress == ZERO_ADDRESS) {
-            revert FacetZeroAddress(
-                _facetAddress, "function: addFunctions(address _facetAddress, bytes4[] memory _fnSelectors)"
-            );
-        }
+        checkFacetAddress(_facetAddress, "function: addFunctions()");
+        checkFnSelectors(_fnSelectors.length);
 
-        // adding functions
         Storage storage ds = getDiamondStorage();
 
         uint256 fnSelectorsCounter = uint256(ds.facetToFnSelectors[_facetAddress].fnSelectors.length);
 
-        // add new facet address if it does not exist
         if (fnSelectorsCounter == 0) {
             addFacet(ds, _facetAddress);
         }
@@ -244,12 +233,12 @@ library DiamondStorageLib {
     }
 
     /// @notice This function is responsible for adding a new facet to the contract's storage.
-    /// @dev It checks if the provided facet address contains contract code.
+    /// @dev It checks:
+    /// @dev if the provided facet address contains bytecode.
     /// @param ds The instance of the contract's storage.
     /// @param _facetAddress The address of the new facet.
-    /// @custom:require _facetAddress must contain contract code.
     function addFacet(Storage storage ds, address _facetAddress) internal {
-        enforceHasContractCode(_facetAddress, "function: addFacet(), result: New facet");
+        enforceHasContractCode(_facetAddress, "function: addFacet()");
 
         ds.facetToFnSelectors[_facetAddress].facetAddressID = ds.facets.length;
         ds.facets.push(_facetAddress);
@@ -275,24 +264,16 @@ library DiamondStorageLib {
                                                   MODIFY FUCNTIONS
     ////////////////////////////////////////////////////////////*/
 
-    /// @dev This function replaces a list of function selectors with a new facet address.
+    /// @notice This function replaces a list of function selectors with a new facet address.
+    /// @dev It check:
+    /// @dev if the provided function selectors array are not empty.
+    /// @dev if the facet address is not zero
+    /// @dev if the selector is already associated with some facet address
     /// @param _facetAddress The new facet address that the function selectors should be associated with.
     /// @param _fnSelectors The list of function selectors to be replaced.
-    /// Requirements:
-    /// - `_fnSelectors` must not be an empty array.
-    /// - `_facetAddress` must be a non-zero address.
-    /// Errors:
-    /// - Emits a `FnSelectorsEmpty` error if `_fnSelectors` is an empty array.
-    /// - Emits a `FacetZeroAddress` error if `_facetAddress` is a zero address.
-    /// - Emits a `CannotAddFunctionToDiamondThatAlreadyExists` error if a function selector is already associated with `_facetAddress`.
     function replaceFunctions(address _facetAddress, bytes4[] memory _fnSelectors) internal {
-        if (_fnSelectors.length <= 0) {
-            revert FnSelectorsEmpty();
-        } else if (_facetAddress == ZERO_ADDRESS) {
-            revert FacetZeroAddress(
-                _facetAddress, "function: replaceFunctions(address _facetAddress, bytes4[] memory _fnSelectors)"
-            );
-        }
+        checkFacetAddress(_facetAddress, "function: replaceFunctions()");
+        checkFnSelectors(_fnSelectors.length);
 
         Storage storage ds = getDiamondStorage();
         uint256 fnSelectorsCounter = uint256(ds.facetToFnSelectors[_facetAddress].fnSelectors.length);
@@ -316,28 +297,18 @@ library DiamondStorageLib {
                                                   REMOVE FUCNTIONS
     ////////////////////////////////////////////////////////////*/
 
-    /// @dev This function removes a single function selector from a specific facet address.
+    /// @notice This function removes a single function selector from a specific facet address.
+    /// @dev It check:
+    /// @dev if the provided function selectors array are not empty.
+    /// @dev if the facet address is not zero
+    /// @dev if facet address is the same address of the diamond
+    /// @dev if the facet does not already contain the function selectors.
+    /// @dev if a function selector does not exist, it will not throw an error. It will just continue to the next operation.
     /// @param ds A reference to the storage slot where the diamond storage structure resides.
     /// @param _facetAddress The facet address that the function selector should be removed from. This must be a non-zero address and not the address of the current contract.
     /// @param _selector The function selector to be removed.
-    /// Requirements:
-    /// - `_facetAddress` must be a non-zero address.
-    /// - `_facetAddress` must not be the address of the current contract.
-    /// - `_selector` must be a valid function selector associated with `_facetAddress`.
-    /// Errors:
-    /// - Emits a `FacetZeroAddress` error if `_facetAddress` is a zero address.
-    /// - Emits a `CannotRemoveImmutableFunction` error if `_facetAddress` is the address of the current contract.
-    /// Notes:
-    /// - If a function selector does not exist, it will not throw an error. It will just continue to the next operation.
     function removeFunction(Storage storage ds, address _facetAddress, bytes4 _selector) internal {
-        if (_facetAddress == ZERO_ADDRESS) {
-            revert FacetZeroAddress(
-                _facetAddress, "function: removeFunction(Storage storage ds, address _facetAddress, bytes4 _selector)"
-            );
-        }
-        if (_facetAddress == address(this)) {
-            revert CannotRemoveImmutableFunction(_facetAddress);
-        }
+        checkFacetAddress(_facetAddress, "function: removeFunction()");
 
         // replace selector with last selector, then delete last selector
         uint256 selectorPosition = ds.fnSelectorToFacet[_selector].fnSelectorsID;
@@ -371,26 +342,17 @@ library DiamondStorageLib {
         }
     }
 
-    /// @dev This function removes a batch of functions for a specific facet address. The removal involves clearing out function selectors associated with this facet.
+    /// @notice This function removes a batch of functions for a specific facet address.
+    /// @dev It check:
+    /// @dev if the provided function selectors array are not empty.
+    /// @dev if the facet address is not zero
+    /// @dev if a function selector does not exist, it will not throw an error. It will just continue to the next function selector.
     /// @param _facetAddress The facet address that the function selectors should be removed from. This must be a non-zero address.
     /// @param _fnSelectors An array of function selectors that are to be removed. This array must not be empty.
-    /// Requirements:
-    /// - `_facetAddress` must be a non-zero address.
-    /// - `_fnSelectors` array must not be empty.
-    /// Errors:
-    /// - Emits a `FnSelectorsEmpty` error if the `_fnSelectors` array is empty.
-    /// - Emits a `FacetZeroAddress` error if `_facetAddress` is a zero address.
-    /// Notes:
-    /// - If a function selector does not exist, it will not throw an error. It will just continue to the next function selector.
     function removeFunctions(address _facetAddress, bytes4[] memory _fnSelectors) internal {
-        if (_fnSelectors.length <= 0) {
-            revert FnSelectorsEmpty();
-        }
-
+        checkFnSelectors(_fnSelectors.length);
         if (_facetAddress != address(0)) {
-            revert FacetZeroAddress(
-                _facetAddress, "function: removeFunctions(address _facetAddress, bytes4[] memory _fnSelectors)"
-            );
+            revert FacetZeroAddress(_facetAddress, "function: removeFunctions()");
         }
 
         Storage storage ds = getDiamondStorage();
@@ -398,6 +360,25 @@ library DiamondStorageLib {
             bytes4 selector = _fnSelectors[selectorIndex];
             address oldFacetAddress = ds.fnSelectorToFacet[selector].facet;
             removeFunction(ds, oldFacetAddress, selector);
+        }
+    }
+
+    function checkFnSelectors(uint256 _fnSelectorsLength) internal pure {
+        bool fnSelectorsLengthIsZero = _fnSelectorsLength <= 0;
+
+        if (fnSelectorsLengthIsZero) {
+            revert FnSelectorsEmpty();
+        }
+    }
+
+    function checkFacetAddress(address _facetAddress, string memory message) internal view {
+        bool facetAddressIsDiamond = _facetAddress == address(this);
+        bool facetAddressIsZero = _facetAddress == ZERO_ADDRESS;
+
+        if (facetAddressIsZero) {
+            revert FacetZeroAddress(_facetAddress, message);
+        } else if (facetAddressIsDiamond) {
+            revert CannotRemoveImmutableFunction(_facetAddress);
         }
     }
 }
