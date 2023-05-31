@@ -1,0 +1,8 @@
+FROM ghcr.io/foundry-rs/foundry
+
+WORKDIR /bank
+COPY . .
+
+
+RUN forge b --skip test
+CMD ["forge script scripts/deploy.anvil.s.sol:DeployAnvil -f http://anvil:8545 --broadcast"]
