@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+    // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity >=0.8.0;
 
 error NoBalance(address sender);
@@ -9,16 +9,16 @@ error NoBalance(address sender);
 /// @dev Do not manually set balances without updating totalSupply, as the sum of all user balances must not exceed it.
 abstract contract ERC20 {
     /*//////////////////////////////////////////////////////////////
-                                 EVENTS
-    //////////////////////////////////////////////////////////////*/
+                                    EVENTS
+        //////////////////////////////////////////////////////////////*/
 
     event Transfer(address indexed from, address indexed to, uint256 amount);
 
     event Approval(address indexed owner, address indexed spender, uint256 amount);
 
     /*//////////////////////////////////////////////////////////////
-                            METADATA STORAGE
-    //////////////////////////////////////////////////////////////*/
+                                METADATA STORAGE
+        //////////////////////////////////////////////////////////////*/
 
     string public name;
 
@@ -27,8 +27,8 @@ abstract contract ERC20 {
     uint8 public immutable decimals;
 
     /*//////////////////////////////////////////////////////////////
-                              ERC20 STORAGE
-    //////////////////////////////////////////////////////////////*/
+                                ERC20 STORAGE
+        //////////////////////////////////////////////////////////////*/
 
     uint256 public totalSupply;
 
@@ -37,8 +37,8 @@ abstract contract ERC20 {
     mapping(address => mapping(address => uint256)) public allowance;
 
     /*//////////////////////////////////////////////////////////////
-                               CONSTRUCTOR
-    //////////////////////////////////////////////////////////////*/
+                                CONSTRUCTOR
+        //////////////////////////////////////////////////////////////*/
 
     constructor(string memory _name, string memory _symbol, uint8 _decimals) {
         name = _name;
@@ -47,8 +47,8 @@ abstract contract ERC20 {
     }
 
     /*//////////////////////////////////////////////////////////////
-                               ERC20 LOGIC
-    //////////////////////////////////////////////////////////////*/
+                                ERC20 LOGIC
+        //////////////////////////////////////////////////////////////*/
 
     function approve(address spender, uint256 amount) public virtual returns (bool) {
         allowance[msg.sender][spender] = amount;
@@ -95,8 +95,8 @@ abstract contract ERC20 {
     }
 
     /*//////////////////////////////////////////////////////////////
-                        INTERNAL MINT/BURN LOGIC
-    //////////////////////////////////////////////////////////////*/
+                            INTERNAL MINT/BURN LOGIC
+        //////////////////////////////////////////////////////////////*/
 
     function _mint(address to, uint256 amount) internal virtual {
         totalSupply += amount;
